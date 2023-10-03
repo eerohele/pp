@@ -1,0 +1,124 @@
+(require '[clojure.test.check.generators :as gen])
+(require '[clojure.pprint :as cpp])
+
+(require '[fipp.edn :as fipp])
+(require '[me.flowthing.pp :as pp])
+
+;; Benchmarks
+
+;; Fipp
+
+(import '(java.io Writer))
+
+(def null-writer (Writer/nullWriter))
+
+(require '[criterium.core :refer [quick-bench]])
+
+;; Numbers
+(def numbers (vec (range 10000)))
+
+'clojure.pprint/pprint
+(quick-bench
+  (cpp/pprint numbers null-writer))
+
+'fipp.edn/pprint
+(quick-bench
+  (binding [*out* null-writer] (fipp/pprint numbers {:width 72})))
+
+'tutkain.impl.pprint/pprint
+(quick-bench
+  (pp/pprint null-writer numbers {:max-width 72}))
+
+;; Code
+(require '[clojure.java.io :as io])
+(import '(clojure.lang LineNumberingPushbackReader))
+
+(def code
+  (with-open [reader (->
+                       "fipp/engine.cljc"
+                       io/resource
+                       io/reader
+                       LineNumberingPushbackReader.)]
+    (doall
+      (take-while #(not= ::EOF %)
+        (repeatedly #(read {:read-cond :allow :eof ::EOF} reader))))))
+
+'clojure.pprint/pprint
+(quick-bench
+  (cpp/pprint code null-writer))
+
+'fipp.edn/pprint
+(quick-bench
+  (binding [*out* null-writer] (fipp/pprint code {:width 72})))
+
+'tutkain.impl.pprint/pprint
+(quick-bench
+  (pp/pprint null-writer code {:max-width 72}))
+
+;; Generative
+(def forms (gen/sample gen/any-printable-equatable 1e3))
+
+(quick-bench
+  (cpp/pprint forms null-writer))
+
+(quick-bench
+  (binding [*out* null-writer] (fipp/pprint forms {:width 72})))
+
+(quick-bench
+  (pp/pprint null-writer forms {:max-width 72}))
+
+;; Analyzer
+(require '[clojure.tools.analyzer.jvm :as analyzer])
+
+(def analyzer-output
+  (analyzer/analyze
+    '(sequence
+       (comp (filter odd?) (map inc) (partition-by even?))
+       (range 10))))
+
+(quick-bench
+  (cpp/pprint analyzer-output null-writer))
+
+(quick-bench
+  (binding [*out* null-writer]
+    (fipp/pprint analyzer-output {:width 72})))
+
+(quick-bench
+  (pp/pprint null-writer analyzer-output {:max-width 72}))
+
+;; Allocated bytes
+
+(import '(java.text StringCharacterIterator))
+(import '(java.lang.management ManagementFactory))
+(import '(com.sun.management ThreadMXBean))
+
+(defn human-readable-byte-count
+  [bytes]
+  (if (< -1000 bytes 1000)
+    (str bytes " B")
+    (let [ci (StringCharacterIterator. "kMGTPE")
+          bytes (loop [bytes bytes]
+                  (if (or (<= bytes -999950) (>= bytes 999950))
+                    (do (.next ci) (recur (/ bytes 1000)))
+                    bytes))]
+      (format "%.1f %cB" (/ bytes 1000.0) (.current ci)))))
+
+(defmacro allocated-bytes
+  [& body]
+  `(let [^ThreadMXBean bean# (ManagementFactory/getThreadMXBean)
+         bytes-before# (.getCurrentThreadAllocatedBytes bean#)]
+     ~@body
+     (let [bytes-after# (.getCurrentThreadAllocatedBytes bean#)]
+       (println
+         (human-readable-byte-count (- bytes-after# bytes-before#))
+         "allocated"))))
+
+(allocated-bytes
+  (cpp/pprint analyzer-output null-writer))
+
+(allocated-bytes
+  (binding [*out* null-writer]
+    (fipp/pprint analyzer-output {:width 72})))
+
+(allocated-bytes
+  (pp/pprint null-writer analyzer-output {:max-width 72}))

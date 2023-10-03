@@ -1,0 +1,40 @@
+name: Check
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        java-version: ['11', '17']
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java-version }}
+
+      - uses: DeLaGuardo/setup-clojure@12.1
+        with:
+          cli: '1.11.1.1208'
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+          key: deps-${{ hashFiles('deps.edn') }}
+          restore-keys: deps-
+
+      - run: clojure -X:dev user/xr! '{:path "check"}'
+
+      - run: clojure -A:dev -X cognitect.test-runner.api/test

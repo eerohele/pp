@@ -1,0 +1,45 @@
+(require '[me.flowthing.pp :as pp])
+(require '[clojure.pprint :as cpp])
+
+;; Bad input
+(pp/pprint nil {:a 1} {:max-width 1})
+(pp/pprint {:a 1} {:max-width -1})
+
+;; Basic nested map
+(pp/pprint
+  {:a 1
+   :b 2
+   :c 3
+   :d 4
+   :e {:a 1 :b 2 :c 3 :d 4 :e {:f 6 :g 7 :h 8 :i 9 :j 10}}}
+  {:max-width 24})
+
+(binding [*print-meta* true *print-readably* false]
+  (pp/pprint (with-meta {:a 1} {:b 2})))
+
+;; clojure.pprint incorrectly prints this with meta
+(binding [*print-meta* true *print-readably* false]
+  (cpp/pprint (with-meta {:a 1} {:b 2})))
+
+;; clojure.pprint incorrectly prints empty meta
+(binding [*print-meta* true *print-readably* false]
+  (cpp/pprint (with-meta {:a 1} {})))
+
+;; Inconsistency between prn and clojure.pprint
+(binding [*print-level* 0 *print-length* 11]
+  (prn
+    (into (sorted-map)
+      (zipmap (map (comp keyword str char) (range 97 123))
+        (range 1 18)))))
+
+(binding [*print-level* 1 *print-length* 11]
+  (pp/pprint
+    (into (sorted-map)
+      (zipmap (map (comp keyword str char) (range 97 123))
+        (range 1 18)))))
+
+(binding [*print-level* 1 *print-length* 11]
+  (cpp/pprint
+    (into (sorted-map)
+      (zipmap (map (comp keyword str char) (range 97 123))
+        (range 1 18)))))
