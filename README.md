@@ -67,7 +67,7 @@ user=> (clojure.repl/doc pp/pprint)
 
 Even though pp is not meant for formatting code, having it format the source of every var in the [`clojure.core`](https://clojure.github.io/clojure/clojure.core-api.html) namespace and comparing the output to that of `clojure.pprint/pprint` is a good exercise because `clojure.core` has a large variety of data structures and nesting levels.
 
-In that exercise, [every difference](https://gist.github.com/eerohele/08e628ea9713c2e3e89df26f144c4edd) between the outputs of `me.flowthing.pp/pprint` and `clojure.pprint/pprint` is one where `clojure.pprint/pprint` doesn't make full use of the 72 character line width even though it could.
+In that exercise, [every difference](https://gist.github.com/eerohele/08e628ea9713c2e3e89df26f144c4edd) between the outputs of `me.flowthing.pp/pprint` and `clojure.pprint/pprint` is one where `clojure.pprint/pprint` doesn't make full use of the 72 character line width (default for both `clojure.pprint/pprint` and pp) even though it could.
 
 Also, unlike `clojure.pprint/pprint`, pp prints records like `pr` does:
 
