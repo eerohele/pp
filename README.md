@@ -24,7 +24,7 @@ data (not code).
 
 ## Non-goals
 
-- Formatting code
+- [Formatting code](https://journal.stuffwithstuff.com/2015/09/08/the-hardest-program-ive-ever-written/#4)
 - API for large-scale [output](https://clojure.github.io/clojure/clojure.pprint-api.html#clojure.pprint/with-pprint-dispatch) [customization](https://github.com/brandonbloom/fipp#idiomatic); to customize, vendor and change whatever you want
 - [`cl-format`](https://clojure.github.io/clojure/clojure.pprint-api.html#clojure.pprint/cl-format)
 
