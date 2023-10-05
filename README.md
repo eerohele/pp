@@ -92,6 +92,11 @@ In addition, there are one or two other minor, insignificant differences in wher
 - pp uses `print-method` for pretty much everything except Clojure's built-in collection types. This means pp prints things like [time-literals](https://github.com/henryw374/time-literals) the same way as `clojure.pprint/pprint`.
 - Fipp prints `(fipp.edn/pprint '@foo)` as `(clojure.core/deref foo)`; pp, like `clojure.pprint/pprint`, prints it as `@foo`. The same with `quote`/`'`,  `var`/`#'`, and `unquote`/`~`.
 
+## Applications
+
+- [Tutkain](https://github.com/eerohele/Tutkain) uses pp to pretty-print evaluation results.
+- [Tab](https://github.com/eerohele/tab) uses pp to pretty-print data structures it can't turn into tables.
+
 ## Acknowledgements
 
 The algorithm pp uses is based on the ideas in [*Pretty-Printing, Converting List to Linear Structure*](https://dspace.mit.edu/handle/1721.1/5797) by Ira Goldstein (Artificial Intelligence, Memo No. 279 in Massachusetts Institute of Technology A.I. Laboratory, February 1973).
