@@ -2,6 +2,12 @@ name: Check
 
 on:
   push:
+    paths:
+      - '**.clj'
+      - '**.cljc'
+      - '**.bb'
+      - '**.edn'
+      - '**.repl'
     branches:
       - main
   workflow_dispatch:
