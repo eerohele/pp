@@ -36,7 +36,7 @@ Either:
 - Pull it in as a [Git dep](https://clojure.org/reference/deps_and_cli#_git):
 
     ```clojure
-    io.github.eerohele/pp {:git/tag "...", :git/sha "..."}
+    io.github.eerohele/pp {:git/tag "2023-10-05.5", :git/sha "7059eec"}
     ```
 
 Then:
