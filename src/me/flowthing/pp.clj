@@ -447,8 +447,8 @@
   Given three args (a java.io.Writer, a object, and an options map),
   pretty-print the object into the writer using the given options.
 
-  If *print-dup* is true, does not attempt to pretty-print; falls back
-  to default print-dup behavior instead.
+  If *print-dup* is true, pprint does not attempt to pretty-print;
+  instead, it falls back to default print-dup behavior.
 
   Options:
 
