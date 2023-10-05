@@ -36,8 +36,7 @@ Either:
 - Pull it in as a [Git dep](https://clojure.org/reference/deps_and_cli#_git):
 
     ```clojure
-    ;; Replace ... with the SHA of the latest commit in this repository.
-    io.github.eerohele/pp {:git/sha "..."}
+    io.github.eerohele/pp {:git/tag "...", :git/sha "..."}
     ```
 
 Then:

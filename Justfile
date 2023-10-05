@@ -4,3 +4,6 @@ test:
 
 bench:
   clojure -X:dev user/xr! '{:path "bench"}'
+
+release:
+  clojure -T:build release
