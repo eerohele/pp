@@ -97,6 +97,7 @@ In addition, there are one or two other minor, insignificant differences in wher
 
 - [Tutkain](https://github.com/eerohele/Tutkain) uses pp to pretty-print evaluation results.
 - [Tab](https://github.com/eerohele/tab) uses pp to pretty-print data structures it can't turn into tables.
+- [Lingo](https://github.com/exoscale/lingo)
 
 ## Acknowledgements
 
