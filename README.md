@@ -90,7 +90,7 @@ In addition, there are one or two other minor, insignificant differences in wher
 
 ## Differences to Fipp
 
-- pp uses `print-method` for pretty much everything except Clojure's built-in collection types. This means pp prints things like [time-literals](https://github.com/henryw374/time-literals) the same way as `clojure.pprint/pprint`.
+- pp uses `print-method` for pretty much everything except Clojure's built-in collection types. This means pp, unlike Fipp, prints things like [time-literals](https://github.com/henryw374/time-literals) the same way as `clojure.pprint/pprint`.
 - Fipp prints `(fipp.edn/pprint '@foo)` as `(clojure.core/deref foo)`; pp, like `clojure.pprint/pprint`, prints it as `@foo`. The same with `quote`/`'`,  `var`/`#'`, and `unquote`/`~`.
 
 ## Applications
