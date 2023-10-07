@@ -14,15 +14,14 @@
   ,,,)
 
 (defn bump-coords
-  [{:git/keys [tag] :as coords}]
+  [{:git/keys [tag sha]}]
   (build/process {:command-args ["mvn" "versions:set" (format "-DnewVersion=%s" tag)]})
   (spit "README.md"
     (->
       (slurp "README.md")
       (string/replace #"(?im)(\{:mvn/version \".+?\"\})" (format "{:mvn/version \"%s\"}" tag))
-      (string/replace #"(?im)(\{:git/tag \".+?\", :git/sha \".+?\"\})"
-        (binding [*print-namespace-maps* false]
-          (pr-str coords))))))
+      (string/replace #"(?im)(\{:git/tag \".+?\" :git/sha \".+?\"\})"
+        (format "{:git/tag \"%s\" :git/sha \"%s\"}" tag sha)))))
 
 (defn release
   [_]

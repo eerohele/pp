@@ -41,7 +41,7 @@ Either:
     me.flowthing/pp {:mvn/version "2023-10-05.5"}
 
     ;; Git coordinates
-    io.github.eerohele/pp {:git/tag "2023-10-05.5", :git/sha "7059eec"}
+    io.github.eerohele/pp {:git/tag "2023-10-05.5" :git/sha "7059eec"}
     ```
 
 Then:
