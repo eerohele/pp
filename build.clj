@@ -14,11 +14,14 @@
   ,,,)
 
 (defn bump-coords
-  [coords]
+  [{:git/keys [tag] :as coords}]
   (spit "README.md"
-    (string/replace (slurp "README.md") #"(?im)(\{:git/tag \".+?\", :git/sha \".+?\"\})"
-      (binding [*print-namespace-maps* false]
-        (pr-str coords)))))
+    (->
+      (slurp "README.md")
+      (string/replace #"(?im)(\{:mvn/version \".+?\"\})" (format "{:mvn/version \"%s\"}"tag))
+      (string/replace #"(?im)(\{:git/tag \".+?\", :git/sha \".+?\"\})"
+        (binding [*print-namespace-maps* false]
+          (pr-str coords))))))
 
 (defn release
   [_]

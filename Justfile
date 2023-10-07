@@ -7,3 +7,4 @@ bench:
 
 release:
   clojure -T:build release
+  mvn deploy
