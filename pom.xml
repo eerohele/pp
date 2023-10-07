@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>me.flowthing</groupId>
+  <artifactId>pp</artifactId>
+  <version>2023-10-05.5</version>
+  <name>pp</name>
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <resources>
+      <resource>
+        <directory>src</directory>
+      </resource>
+    </resources>
+  </build>
+  <repositories>
+    <repository>
+         <id>clojars</id>
+         <url>https://repo.clojars.org/</url>
+      </repository>
+   </repositories>
+   <distributionManagement>
+      <repository>
+      <id>clojars</id>
+      <name>Clojars repository</name>
+      <url>https://clojars.org/repo</url>
+    </repository>
+  </distributionManagement>
+  <description>pp is a fast, single-namespace, zero-dependency Clojure pretty-printer for data (not code).</description>
+  <url>https://github.com/eerohele/pp</url>
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>https://mit-license.org</url>
+    </license>
+  </licenses>
+  <scm>
+    <url>https://github.com/eerohele/pp</url>
+  </scm>
+</project>
