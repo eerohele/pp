@@ -34,9 +34,13 @@ data (not code).
 Either:
 
 - Copy [`src/me/flowthing/pp.clj`](https://github.com/eerohele/pp/blob/main/src/me/flowthing/pp.clj) into your codebase and rename the namespace to avoid conflicts, or:
-- Pull it in as a [Git dep](https://clojure.org/reference/deps_and_cli#_git):
+- Pull it in as a Maven dep or a [Git dep](https://clojure.org/reference/deps_and_cli#_git):
 
     ```clojure
+    ;; Maven coordinates
+    me.flowthing/pp {:mvn/version "2023-10-05.5"}
+
+    ;; Git coordinates
     io.github.eerohele/pp {:git/tag "2023-10-05.5", :git/sha "7059eec"}
     ```
 
