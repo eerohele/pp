@@ -67,6 +67,8 @@ user=> (clojure.repl/doc pp/pprint)
 ...
 ```
 
+The API is stable and there will be no breaking changes.
+
 ## Differences to clojure.pprint
 
 Even though pp is not meant for formatting code, having it format the source of every var in the [`clojure.core`](https://clojure.github.io/clojure/clojure.core-api.html) namespace and comparing the output to that of `clojure.pprint/pprint` is a good exercise because `clojure.core` has a large variety of data structures and nesting levels.
