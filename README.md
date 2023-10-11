@@ -67,7 +67,7 @@ user=> (clojure.repl/doc pp/pprint)
 ...
 ```
 
-The API is stable and there will be no breaking changes.
+The API is stable and there will be no breaking changes. Everything except for `me.flowthing.pp/pprint` is internal and subject to change.
 
 ## Differences to clojure.pprint
 
