@@ -1,6 +1,9 @@
 (ns me.flowthing.pp-test
   (:require [clojure.pprint :as cpp]
             [clojure.test :refer [deftest is]]
+            [clojure.test.check.clojure-test :refer [defspec]]
+            [clojure.test.check.generators :as gen]
+            [clojure.test.check.properties :refer [for-all]]
             [time-literals.read-write :as time-literals]
             [me.flowthing.pp :as sut]))
 
@@ -248,3 +251,82 @@
                (java.util.UUID/randomUUID)
                (->R 1)]]
       (is (= (str (print-str x) \newline) (pp-str x))))))
+
+(defspec roundtrip 10000
+  (for-all [x gen/any-printable-equatable
+            print-dup gen/boolean]
+    (= x
+      (read-string
+        (with-out-str
+          (binding [*print-length* nil
+                    *print-level* nil
+                    *print-dup* print-dup]
+            (sut/pprint x)))))))
+
+;; With infinite max width, prints everything the same way as prn.
+(defspec print-linear 10000
+  (for-all [x gen/any-printable-equatable]
+    (=
+      (with-out-str (sut/pprint x {:max-width ##Inf}))
+      (with-out-str (prn x)))))
+
+(defspec pp-vs-cpp-vec 1000
+  (for-all [print-level gen/nat
+            print-length gen/nat
+            x (gen/vector gen/int)]
+    (binding [*print-level* print-level
+              *print-length* print-length]
+      (= (with-out-str (sut/pprint x)) (with-out-str (cpp/pprint x))))))
+
+(defspec pp-vs-cpp-map-1 1000
+  (for-all [print-length gen/nat
+            print-level gen/nat
+            x (gen/map gen/keyword gen/int)]
+    (binding [*print-level* print-level
+              *print-length* print-length]
+      (= (with-out-str (sut/pprint x)) (with-out-str (cpp/pprint x))))))
+
+(defspec pp-vs-cpp-map-2 1000
+  (for-all [print-length gen/nat
+            print-level gen/nat
+            print-namespace-maps gen/boolean
+            x (gen/map gen/keyword-ns gen/int)]
+    (binding [*print-level* print-level
+              *print-length* print-length
+              *print-namespace-maps* print-namespace-maps]
+      (= (with-out-str (sut/pprint x)) (with-out-str (cpp/pprint x))))))
+
+(defspec pp-vs-cpp-map-3 75
+  (for-all [print-namespace-maps gen/boolean
+            x (gen/map (gen/one-of [gen/keyword-ns gen/symbol-ns])
+                gen/any-printable-equatable)]
+    (binding [*print-namespace-maps* print-namespace-maps]
+      (=
+        (with-out-str
+          (sut/pprint x {:max-width ##Inf}))
+        (with-out-str
+          (binding [cpp/*print-right-margin* ##Inf]
+            (cpp/pprint x)))))))
+
+;; A generative test that checks that pp/print and cpp/print print any
+;; gen/any-printable-equatable the same way would be great, but
+;; cpp/print sometimes prints things in miser mode even when there's
+;; enough space to use linear mode, and I don't want to have my impl do
+;; that.
+;;
+;; With infinite max width, however, me.flowthing.pp prints everything
+;; the same way as clojure.pprint.
+(defspec pp-vs-cpp-inf-max-with 1000
+  (for-all [x gen/any-printable-equatable]
+    (binding [cpp/*print-right-margin* ##Inf]
+      (=
+        (with-out-str (sut/pprint x {:max-width ##Inf}))
+        (with-out-str (cpp/pprint x))))))
+
+(defspec print-readably 1000
+  (for-all [x (gen/one-of [gen/string (gen/vector gen/char)])
+            print-readably gen/boolean]
+    (binding [*print-readably* print-readably]
+      (=
+        (with-out-str (sut/pprint x))
+        (with-out-str (cpp/pprint x))))))
