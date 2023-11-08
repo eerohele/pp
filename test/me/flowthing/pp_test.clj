@@ -17,22 +17,25 @@
   "Given an input and printing options, check that the SUT prints the
   input the same way as clojure.pprint/pprint."
   [input &
-   {:keys [print-length print-level print-meta print-readably max-width]
+   {:keys [print-length print-level print-meta print-readably print-namespace-maps max-width]
     :or {print-length nil
          print-level nil
          print-meta false
          print-readably true
+         print-namespace-maps false
          max-width 72}}]
   `(is (= (binding [cpp/*print-right-margin* ~max-width
                     *print-length* ~print-length
                     *print-level* ~print-level
                     *print-meta* ~print-meta
-                    *print-readably* ~print-readably]
+                    *print-readably* ~print-readably
+                    *print-namespace-maps* ~print-namespace-maps]
             (with-out-str (cpp/pprint ~input)))
          (binding [*print-length* ~print-length
                    *print-level* ~print-level
                    *print-meta* ~print-meta
-                   *print-readably* ~print-readably]
+                   *print-readably* ~print-readably
+                   *print-namespace-maps* ~print-namespace-maps]
            (with-out-str (sut/pprint ~input {:max-width ~max-width}))))))
 
 (comment ($ {:a 1}) ,,,)
@@ -148,30 +151,27 @@
     ($ '('#{boolean char floats}) {:max-width 23}))
 
   ;; Namespace maps
-  (binding [*print-namespace-maps* true] ($ {:a/b 1}))
-  (binding [*print-namespace-maps* true] ($ {:a/b 1 :a/c 2}))
-  (binding [*print-namespace-maps* true] ($ {:a/b 1 :c/d 2}))
-  (binding [*print-namespace-maps* true] ($ {:a/b {:a/b 1}}))
-  (binding [*print-namespace-maps* true] ($ {'a/b 1}))
-  (binding [*print-namespace-maps* true] ($ {'a/b 1 'a/c 3}))
-  (binding [*print-namespace-maps* true] ($ {'a/b 1 'c/d 2}))
-  (binding [*print-namespace-maps* true] ($ {'a/b {'a/b 1}}))
-  (binding [*print-namespace-maps* false] ($ {:a/b 1}))
-  (binding [*print-namespace-maps* false] ($ {:a/b 1 :a/c 2}))
-  (binding [*print-namespace-maps* false] ($ {:a/b 1 :c/d 2}))
-  (binding [*print-namespace-maps* false] ($ {:a/b {:a/b 1}}))
-  (binding [*print-namespace-maps* false] ($ {'a/b 1}))
-  (binding [*print-namespace-maps* false] ($ {'a/b 1 'a/c 3}))
-  (binding [*print-namespace-maps* false] ($ {'a/b 1 'c/d 2}))
-  (binding [*print-namespace-maps* false] ($ {'a/b {'a/b 1}}))
+  ($ {:a/b 1} :print-namespace-maps true)
+  ($ {:a/b 1 :a/c 2} :print-namespace-maps true)
+  ($ {:a/b 1 :c/d 2} :print-namespace-maps true)
+  ($ {:a/b {:a/b 1}} :print-namespace-maps true)
+  ($ {'a/b 1} :print-namespace-maps true)
+  ($ {'a/b 1 'a/c 3} :print-namespace-maps true)
+  ($ {'a/b 1 'c/d 2} :print-namespace-maps true)
+  ($ {'a/b {'a/b 1}} :print-namespace-maps true)
+  ($ {:a/b 1} :print-namespace-maps false)
+  ($ {:a/b 1 :a/c 2} :print-namespace-maps false)
+  ($ {:a/b 1 :c/d 2} :print-namespace-maps false)
+  ($ {:a/b {:a/b 1}} :print-namespace-maps false)
+  ($ {'a/b 1} :print-namespace-maps false)
+  ($ {'a/b 1 'a/c 3} :print-namespace-maps false)
+  ($ {'a/b 1 'c/d 2} :print-namespace-maps false)
+  ($ {'a/b {'a/b 1}} :print-namespace-maps false)
 
   ($ (struct (create-struct :q/a :q/b :q/c) 1 2 3))
 
-  (binding [*print-namespace-maps* true]
-    ($ #:a{:b 1 :c 2} :max-width 14))
-
-  (binding [*print-namespace-maps* true]
-    ($ #{'a/b 1 'a/c 2} :max-width 14))
+  ($ #:a{:b 1 :c 2} :max-width 14 :print-namespace-maps true)
+  ($ #{'a/b 1 'a/c 2} :max-width 14 :print-namespace-maps true)
 
   ;; Custom tagged literals
   ($ #time/date "2023-10-02")
