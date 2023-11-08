@@ -96,20 +96,6 @@
 (def ^:private reader-macros
   {`quote "'" `deref "@" `var "#'" `unquote "~"})
 
-(defn ^:private reader-macro?
-  "Return true iff coll implies a reader macro.
-
-  That is, one of:
-
-    - (quote foo)
-    - (clojure.core/deref foo)
-    - (var foo)
-    - (unquote foo)"
-  [coll]
-  (and
-    (seq? coll)
-    (contains? reader-macros (first coll))))
-
 (defn ^:private open-delim+form
   "Given a coll, return a tuple where the first item is the coll's
   opening delimiter and the second item is the coll.
@@ -153,16 +139,9 @@
   "Like -print, but only for built-in colls (lists, maps, vectors, and
   sets)."
   [coll ^Writer writer {:keys [level] :or {level 0} :as opts}]
-  (cond
-    (meets-print-level? level)
+  (if (meets-print-level? level)
     (.write writer "#")
 
-    (reader-macro? coll)
-    (do
-      (.write writer ^String (reader-macros (first coll)))
-      (print-method (second coll) writer))
-
-    :else
     (let [[^String o form] (open-delim+form coll)]
       (.write writer o)
 
@@ -196,7 +175,11 @@
 
   clojure.lang.ISeq
   (-print [this ^Writer writer opts]
-    (-print-coll this writer opts))
+    (if-some [reader-macro (reader-macros (.first this))]
+      (do
+        (.write writer ^String reader-macro)
+        (print-method (second this) writer))
+      (-print-coll this writer opts)))
 
   clojure.lang.IPersistentMap
   (-print [this ^Writer writer opts]
@@ -279,18 +262,8 @@
   "Like -pprint, but only for built-in colls (lists, maps, vectors, and
   sets)."
   [this writer {:keys [level indentation reserve-chars] :as opts}]
-  (cond
-    (meets-print-level? level)
+  (if (meets-print-level? level)
     (write writer "#")
-
-    (reader-macro? this)
-    (do
-      (write writer ^String (reader-macros (first this)))
-      (-pprint (second this) writer
-        (update opts :indentation
-          (fn [indentation] (str indentation " ")))))
-
-    :else
     (let [s (print-linear this opts)
 
           ;; If all keys in the map share a namespace and *print-
@@ -409,7 +382,13 @@
 
   clojure.lang.ISeq
   (-pprint [this writer opts]
-    (-pprint-coll this writer opts))
+    (if-some [reader-macro (reader-macros (.first this))]
+      (do
+        (write writer reader-macro)
+        (-pprint (second this) writer
+          (update opts :indentation
+            (fn [indentation] (str indentation " ")))))
+      (-pprint-coll this writer opts)))
 
   clojure.lang.IPersistentMap
   (-pprint [this writer opts]
