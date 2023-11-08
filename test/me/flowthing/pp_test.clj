@@ -129,8 +129,6 @@
   ($ '('#{boolean char floats}) :max-width 23)
   ($ '('#{boolean char floats}) :max-width 23 :print-level 0)
   ($ '('#{boolean char floats}) :max-width 23 :print-length 0)
-  ($ '('#{boolean char floats}) :max-width 23 :print-level 1)
-  ($ '('#{boolean char floats}) :max-width 23 :print-length 1 :print-level 1)
   ($ '('#{boolean char floats}) :max-width 23 :print-length 3)
 
   ;; Namespace maps
@@ -194,6 +192,27 @@
   (is (= "#me.flowthing.pp_test.R{:x\n                        {:a 1,\n                         :b 2,\n                         :c 3,\n                         :d 4}}\n"
         (with-out-str (sut/pprint (->R {:a 1 :b 2 :c 3 :d 4})
                         {:max-width 31})))))
+
+(deftest pprint-reader-macro-edge-cases
+  ;; do not print the reader macro character if the collection following the
+  ;; character exceeds print level
+  (is (= "#\n"
+        (binding [*print-level* 0]
+          (with-out-str (sut/pprint '('#{boolean char floats}))))))
+  (is (= "(#)\n"
+        (binding [*print-level* 1]
+          (with-out-str (sut/pprint '('#{boolean char floats}))))))
+  (is (= "(#)\n"
+        (binding [*print-length* 1 *print-level* 1]
+          (with-out-str (sut/pprint '('#{boolean char floats}))))))
+
+  ;; reader macro characters do not count towards *print-length*
+  (is (= "(...)\n"
+        (binding [*print-length* 0]
+          (with-out-str (sut/pprint '('#{boolean char floats}))))))
+  (is (= "('#{boolean ...})\n"
+        (binding [*print-length* 1]
+          (with-out-str (sut/pprint '('#{boolean char floats})))))))
 
 (deftype T
   [xs]

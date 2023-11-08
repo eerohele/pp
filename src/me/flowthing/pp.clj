@@ -383,11 +383,13 @@
   clojure.lang.ISeq
   (-pprint [this writer opts]
     (if-some [reader-macro (reader-macros (.first this))]
-      (do
-        (write writer reader-macro)
-        (-pprint (second this) writer
-          (update opts :indentation
-            (fn [indentation] (str indentation " ")))))
+      (if (meets-print-level? (:level opts))
+        (write writer "#")
+        (do
+          (write writer reader-macro)
+          (-pprint (second this) writer
+            (update opts :indentation
+              (fn [indentation] (str indentation " "))))))
       (-pprint-coll this writer opts)))
 
   clojure.lang.IPersistentMap
