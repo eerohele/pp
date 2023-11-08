@@ -61,16 +61,9 @@
   ;; Queues
   ($ (clojure.lang.PersistentQueue/EMPTY))
   ($ (conj (clojure.lang.PersistentQueue/EMPTY) 1))
-
-  (binding [*print-length* 1]
-    ($ (conj (clojure.lang.PersistentQueue/EMPTY) 1 2 3)))
-
-  (binding [*print-level* 1]
-    ($ (conj (clojure.lang.PersistentQueue/EMPTY) 1 2 3)))
-
-  (binding [*print-length* 1 *print-level* 1]
-    ($ (conj (clojure.lang.PersistentQueue/EMPTY) 1 2 3)))
-
+  ($ (conj (clojure.lang.PersistentQueue/EMPTY) 1 2 3) :print-length 1)
+  ($ (conj (clojure.lang.PersistentQueue/EMPTY) 1 2 3) :print-level 1)
+  ($ (conj (clojure.lang.PersistentQueue/EMPTY) 1 2 3) :print-length 1 :print-level 1)
   ($ (conj (clojure.lang.PersistentQueue/EMPTY) 1 2 3) :max-width 6)
 
   ;; Max width
@@ -134,21 +127,11 @@
   ($ ''foo)
   ($ '~foo)
   ($ '('#{boolean char floats}) :max-width 23)
-
-  (binding [*print-level* 0]
-    ($ '('#{boolean char floats}) :max-width 23))
-
-  (binding [*print-length* 0]
-    ($ '('#{boolean char floats}) :max-width 23))
-
-  (binding [*print-level* 1]
-    ($ '('#{boolean char floats}) :max-width 23))
-
-  (binding [*print-length* 1 *print-level* 1]
-    ($ '('#{boolean char floats}) :max-width 23))
-
-  (binding [*print-length* 3]
-    ($ '('#{boolean char floats}) {:max-width 23}))
+  ($ '('#{boolean char floats}) :max-width 23 :print-level 0)
+  ($ '('#{boolean char floats}) :max-width 23 :print-length 0)
+  ($ '('#{boolean char floats}) :max-width 23 :print-level 1)
+  ($ '('#{boolean char floats}) :max-width 23 :print-length 1 :print-level 1)
+  ($ '('#{boolean char floats}) :max-width 23 :print-length 3)
 
   ;; Namespace maps
   ($ {:a/b 1} :print-namespace-maps true)
@@ -180,12 +163,12 @@
   ($ (sorted-map))
   ($ (sorted-map :a 1 :b 2))
 
-  (binding [*print-length* 1] ($ (sorted-map :a 1 :b 2)))
+  ($ (sorted-map :a 1 :b 2) :print-length 1)
 
   ;; Sorted sets
   ($ (sorted-set))
   ($ (sorted-set 1 2 3))
-  (binding [*print-length* 1] ($ (sorted-set 1 2 3)))
+  ($ (sorted-set 1 2 3) :print-length 1)
 
   ;; Symbolic
   ($ ##Inf)
