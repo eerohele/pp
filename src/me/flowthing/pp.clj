@@ -154,7 +154,8 @@
                   n (next form)]
               (-print f writer (update opts :level inc))
               (when-not (empty? n)
-                (when (map-entry? f) (.write writer ","))
+                (when (map-entry? f)
+                  (.write writer ^String (:map-entry-separator opts)))
                 (.write writer " ")
                 (recur n (inc index)))))))
 
@@ -333,11 +334,10 @@
                     (-pprint f writer (update opts :reserve-chars inc))
 
                     (map-entry? f)
-                    (do
-                      ;; Reserve a slot for the comma trailing the
-                      ;; map entry.
-                      (-pprint f writer (assoc opts :reserve-chars 1))
-                      (write writer ",")
+                    (let [^String map-entry-separator (:map-entry-separator opts)]
+                      ;; Reserve a slot for the map entry separator.
+                      (-pprint f writer (assoc opts :reserve-chars (.length map-entry-separator)))
+                      (write writer map-entry-separator)
                       (write-sep writer mode)
                       (recur n (inc index)))
 
@@ -435,13 +435,17 @@
 
     :max-width (long or ##Inf, default: 72)
       Avoid printing anything beyond the column indicated by this
-      value."
+      value.
+
+    :map-entry-separator (string, default: \",\")
+      The string to print between map entries. To not print commas
+      between map entries, use an empty string."
   ([x]
    (pprint *out* x nil))
   ([x opts]
    (pprint *out* x opts))
-  ([^Writer writer x {:keys [max-width]
-                      :or {max-width 72}
+  ([^Writer writer x {:keys [max-width map-entry-separator]
+                      :or {max-width 72 map-entry-separator ","}
                       :as opts}]
    (assert (or (nat-int? max-width) (= max-width ##Inf))
      ":max-width must be a natural int or ##Inf")
@@ -455,5 +459,9 @@
        (.write writer "\n"))
      (let [writer (count-keeping-writer writer {:max-width max-width})]
        (-pprint x writer
-         (assoc opts :level 0 :indentation "" :reserve-chars 0))
+         (assoc opts
+           :level 0
+           :indentation ""
+           :reserve-chars 0
+           :map-entry-separator map-entry-separator))
        (nl writer)))))

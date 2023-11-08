@@ -10,8 +10,8 @@
 (time-literals/print-time-literals-clj!)
 
 (defn pp-str
-  [x]
-  (with-out-str (sut/pprint x)))
+  [x & opts]
+  (with-out-str (sut/pprint x opts)))
 
 (defmacro $
   "Given an input and printing options, check that the SUT prints the
@@ -214,6 +214,14 @@
         (binding [*print-length* 1]
           (with-out-str (sut/pprint '('#{boolean char floats})))))))
 
+(deftest map-entry-separator
+  (is (= "{:a 1, :b 2}\n" (pp-str {:a 1 :b 2})))
+  (is (= "{:a 1, :b 2}\n" (pp-str {:a 1 :b 2} :map-entry-separator ",")))
+  (is (= "{:a 1,,, :b 2}\n" (pp-str {:a 1 :b 2} :map-entry-separator ",,,")))
+  (is (= "{:a 1,,,\n :b 2}\n" (pp-str {:a 1 :b 2} :max-width 8 :map-entry-separator ",,,")))
+  (is (= "{:a 1 :b 2}\n" (pp-str {:a 1 :b 2} :map-entry-separator "")))
+  (is (= "{:a 1\n :b 2}\n" (pp-str {:a 1 :b 2} :max-width 7 :map-entry-separator ""))))
+
 (deftype T
   [xs]
   clojure.lang.Associative
@@ -256,14 +264,15 @@
 
 (defspec roundtrip 10000
   (for-all [x gen/any-printable-equatable
-            print-dup gen/boolean]
+            print-dup gen/boolean
+            map-entry-separator (gen/elements #{"," ""})]
     (= x
       (read-string
         (with-out-str
           (binding [*print-length* nil
                     *print-level* nil
                     *print-dup* print-dup]
-            (sut/pprint x)))))))
+            (sut/pprint x {:map-entry-separator map-entry-separator})))))))
 
 ;; With infinite max width, prints everything the same way as prn.
 (defspec print-linear 10000
