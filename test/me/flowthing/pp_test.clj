@@ -186,33 +186,23 @@
 (deftest pprint-record
   ;; unlike pr, clojure.pprint doesn't print records with the
   ;; fully-qualified record name in the prefix.
-  (is (= (with-out-str (prn (->R 1)))
-        (with-out-str (sut/pprint (->R 1)))))
+  (is (= (with-out-str (prn (->R 1))) (pp-str (->R 1))))
 
   (is (= "#me.flowthing.pp_test.R{:x\n                        {:a 1,\n                         :b 2,\n                         :c 3,\n                         :d 4}}\n"
-        (with-out-str (sut/pprint (->R {:a 1 :b 2 :c 3 :d 4})
-                        {:max-width 31})))))
+        (pp-str (->R {:a 1 :b 2 :c 3 :d 4}) :max-width 31))))
 
 (deftest pprint-reader-macro-edge-cases
   ;; do not print the reader macro character if the collection following the
   ;; character exceeds print level
-  (is (= "#\n"
-        (binding [*print-level* 0]
-          (with-out-str (sut/pprint '('#{boolean char floats}))))))
-  (is (= "(#)\n"
-        (binding [*print-level* 1]
-          (with-out-str (sut/pprint '('#{boolean char floats}))))))
-  (is (= "(#)\n"
-        (binding [*print-length* 1 *print-level* 1]
-          (with-out-str (sut/pprint '('#{boolean char floats}))))))
+  (is (= "#\n" (binding [*print-level* 0] (pp-str '('#{boolean char floats})))))
+  (is (= "(#)\n" (binding [*print-level* 1] (pp-str '('#{boolean char floats})))))
+  (is (= "(#)\n" (binding [*print-length* 1 *print-level* 1] (pp-str '('#{boolean char floats})))))
 
   ;; reader macro characters do not count towards *print-length*
   (is (= "(...)\n"
-        (binding [*print-length* 0]
-          (with-out-str (sut/pprint '('#{boolean char floats}))))))
+        (binding [*print-length* 0] (pp-str '('#{boolean char floats})))))
   (is (= "('#{boolean ...})\n"
-        (binding [*print-length* 1]
-          (with-out-str (sut/pprint '('#{boolean char floats})))))))
+        (binding [*print-length* 1] (pp-str '('#{boolean char floats}))))))
 
 (deftest map-entry-separator
   (is (= "{:a 1, :b 2}\n" (pp-str {:a 1 :b 2})))
@@ -234,10 +224,10 @@
 (deftest pprint-custom-type
   (is (re-matches obj-re (with-out-str (prn (T. {:a 1})))))
   (is (re-matches obj-re (with-out-str (cpp/pprint (T. {:a 1})))))
-  (is (re-matches obj-re (with-out-str (sut/pprint (T. {:a 1})))))
+  (is (re-matches obj-re (pp-str (T. {:a 1}))))
 
   (binding [*print-level* 0]
-    (is (re-matches obj-re (with-out-str (sut/pprint (T. {:a 1})))))))
+    (is (re-matches obj-re (pp-str (T. {:a 1}))))))
 
 (deftest pprint-dup
   (binding [*print-dup* true]
@@ -268,18 +258,15 @@
             map-entry-separator (gen/elements #{"," ""})]
     (= x
       (read-string
-        (with-out-str
-          (binding [*print-length* nil
-                    *print-level* nil
-                    *print-dup* print-dup]
-            (sut/pprint x {:map-entry-separator map-entry-separator})))))))
+        (binding [*print-length* nil
+                  *print-level* nil
+                  *print-dup* print-dup]
+          (pp-str x :map-entry-separator map-entry-separator))))))
 
 ;; With infinite max width, prints everything the same way as prn.
 (defspec print-linear 10000
   (for-all [x gen/any-printable-equatable]
-    (=
-      (with-out-str (sut/pprint x {:max-width ##Inf}))
-      (with-out-str (prn x)))))
+    (= (pp-str x :max-width ##Inf) (with-out-str (prn x)))))
 
 (defspec pp-vs-cpp-vec 1000
   (for-all [print-level gen/nat
@@ -287,7 +274,7 @@
             x (gen/vector gen/int)]
     (binding [*print-level* print-level
               *print-length* print-length]
-      (= (with-out-str (sut/pprint x)) (with-out-str (cpp/pprint x))))))
+      (= (pp-str x) (with-out-str (cpp/pprint x))))))
 
 (defspec pp-vs-cpp-map-1 1000
   (for-all [print-length gen/nat
@@ -295,7 +282,7 @@
             x (gen/map gen/keyword gen/int)]
     (binding [*print-level* print-level
               *print-length* print-length]
-      (= (with-out-str (sut/pprint x)) (with-out-str (cpp/pprint x))))))
+      (= (pp-str x) (with-out-str (cpp/pprint x))))))
 
 (defspec pp-vs-cpp-map-2 1000
   (for-all [print-length gen/nat
@@ -305,7 +292,7 @@
     (binding [*print-level* print-level
               *print-length* print-length
               *print-namespace-maps* print-namespace-maps]
-      (= (with-out-str (sut/pprint x)) (with-out-str (cpp/pprint x))))))
+      (= (pp-str x) (with-out-str (cpp/pprint x))))))
 
 (defspec pp-vs-cpp-map-3 75
   (for-all [print-namespace-maps gen/boolean
@@ -313,8 +300,7 @@
                 gen/any-printable-equatable)]
     (binding [*print-namespace-maps* print-namespace-maps]
       (=
-        (with-out-str
-          (sut/pprint x {:max-width ##Inf}))
+        (pp-str x :max-width ##Inf)
         (with-out-str
           (binding [cpp/*print-right-margin* ##Inf]
             (cpp/pprint x)))))))
@@ -330,14 +316,10 @@
 (defspec pp-vs-cpp-inf-max-with 1000
   (for-all [x gen/any-printable-equatable]
     (binding [cpp/*print-right-margin* ##Inf]
-      (=
-        (with-out-str (sut/pprint x {:max-width ##Inf}))
-        (with-out-str (cpp/pprint x))))))
+      (= (pp-str x :max-width ##Inf) (with-out-str (cpp/pprint x))))))
 
 (defspec print-readably 1000
   (for-all [x (gen/one-of [gen/string (gen/vector gen/char)])
             print-readably gen/boolean]
     (binding [*print-readably* print-readably]
-      (=
-        (with-out-str (sut/pprint x))
-        (with-out-str (cpp/pprint x))))))
+      (= (pp-str x) (with-out-str (cpp/pprint x))))))
