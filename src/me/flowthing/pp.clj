@@ -78,8 +78,9 @@
 
     :max-width (long)
       Maximum line width."
-  [^Writer writer {:keys [max-width]}]
-  (let [c (volatile! 0)]
+  [^Writer writer opts]
+  (let [max-width (:max-width opts)
+        c (volatile! 0)]
     (reify CountKeepingWriter
       (write [_ s]
         (.write writer ^String s)
@@ -138,8 +139,8 @@
 (defn ^:private -print-coll
   "Like -print, but only for built-in colls (lists, maps, vectors, and
   sets)."
-  [coll ^Writer writer {:keys [level] :or {level 0} :as opts}]
-  (if (meets-print-level? level)
+  [coll ^Writer writer opts]
+  (if (meets-print-level? (:level opts 0))
     (.write writer "#")
 
     (let [[^String o form] (open-delim+form coll)]
@@ -165,8 +166,8 @@
     (.write writer "nil"))
 
   clojure.lang.AMapEntry
-  (-print [this ^Writer writer {:keys [level] :as opts}]
-    (if (meets-print-level? level)
+  (-print [this ^Writer writer opts]
+    (if (meets-print-level? (:level opts))
       (.write writer "#")
       (let [opts (update opts :level inc)]
         (-print (key this) writer opts)
@@ -261,8 +262,8 @@
 (defn ^:private -pprint-coll
   "Like -pprint, but only for built-in colls (lists, maps, vectors, and
   sets)."
-  [this writer {:keys [level indentation reserve-chars] :as opts}]
-  (if (meets-print-level? level)
+  [this writer opts]
+  (if (meets-print-level? (:level opts))
     (write writer "#")
     (let [s (print-linear this opts)
 
@@ -277,7 +278,7 @@
           ;; parent S-expression plus a number of spaces equal to the
           ;; length of the open delimiter (e.g. one for "(", two for
           ;; "#{").
-          indentation (str indentation (.repeat " " (.length o)))
+          indentation (str (:indentation opts) (.repeat " " (.length o)))
 
           ;; If, after (possibly) reserving space for any closing
           ;; delimiters of ancestor S-expressions, there's enough space
@@ -285,7 +286,7 @@
           ;; so.
           ;;
           ;; Otherwise, print the form in miser style.
-          mode (print-mode writer s reserve-chars)
+          mode (print-mode writer s (:reserve-chars opts))
 
           opts (-> opts
                  (assoc :indentation indentation)
@@ -361,9 +362,8 @@
   ;; Additionally, we want to keep the key and the value on the same
   ;; line whenever we can.
   clojure.lang.AMapEntry
-  (-pprint [this writer
-            {:keys [level indentation reserve-chars] :as opts}]
-    (if (meets-print-level? level)
+  (-pprint [this writer opts]
+    (if (meets-print-level? (:level opts))
       (write writer "#")
       (let [k (key this)
             opts (update opts :level inc)]
@@ -375,9 +375,9 @@
               ;; space to write the val on the same line, do so.
               ;; Otherwise, write indentation followed by val on the
               ;; following line.
-              mode (print-mode writer s (inc reserve-chars))]
+              mode (print-mode writer s (inc (:reserve-chars opts)))]
           (write-sep writer mode)
-          (when (= :miser mode) (write writer indentation))
+          (when (= :miser mode) (write writer (:indentation opts)))
           (-pprint v writer opts)))))
 
   clojure.lang.ISeq
