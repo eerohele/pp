@@ -148,11 +148,11 @@
   ($ {'a/b 1 'a/c 3} :print-namespace-maps false)
   ($ {'a/b 1 'c/d 2} :print-namespace-maps false)
   ($ {'a/b {'a/b 1}} :print-namespace-maps false)
-
-  ($ (struct (create-struct :q/a :q/b :q/c) 1 2 3))
-
   ($ #:a{:b 1 :c 2} :max-width 14 :print-namespace-maps true)
   ($ #{'a/b 1 'a/c 2} :max-width 14 :print-namespace-maps true)
+
+  ;; Struct
+  ($ (struct (create-struct :q/a :q/b :q/c) 1 2 3))
 
   ;; Custom tagged literals
   ($ #time/date "2023-10-02")
