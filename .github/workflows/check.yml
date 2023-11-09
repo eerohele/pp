@@ -5,6 +5,7 @@ on:
     paths:
       - '**.clj'
       - '**.cljc'
+      - '**.cljs'
       - '**.bb'
       - '**.edn'
       - '**.repl'
@@ -29,6 +30,10 @@ jobs:
           distribution: 'temurin'
           java-version: ${{ matrix.java-version }}
 
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
       - uses: DeLaGuardo/setup-clojure@12.1
         with:
           cli: '1.11.1.1208'
@@ -44,3 +49,7 @@ jobs:
       - run: clojure -X:dev user/xr! '{:path "check"}'
 
       - run: clojure -A:dev -X cognitect.test-runner.api/test
+
+      - run: npm install
+
+      - run: npx shadow-cljs compile test && node out/test.js

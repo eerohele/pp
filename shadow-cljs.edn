@@ -1,0 +1,11 @@
+{:nrepl false
+ :socket-repl true
+ :deps {:aliases [:dev]}
+ :builds {:lib {:target :node-library
+                :exports-var me.flowthing.pp/pprint
+                :output-to "out/pp.js"}
+
+          :test {:target :node-test
+                 :output-to "out/test.js"
+                 :ns-regexp "-test$"
+                 :autorun true}}}
