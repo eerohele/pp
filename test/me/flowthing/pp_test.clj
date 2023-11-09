@@ -160,13 +160,14 @@
   ;; Sorted maps
   ($ (sorted-map))
   ($ (sorted-map :a 1 :b 2))
-
   ($ (sorted-map :a 1 :b 2) :print-length 1)
+  ($ (sorted-map :a 1 :b 2) :max-width 7)
 
   ;; Sorted sets
   ($ (sorted-set))
   ($ (sorted-set 1 2 3))
   ($ (sorted-set 1 2 3) :print-length 1)
+  ($ (sorted-set 1 2 3) :max-width 3)
 
   ;; Symbolic
   ($ ##Inf)
