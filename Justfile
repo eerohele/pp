@@ -1,3 +1,6 @@
+test-bb:
+  bb test/run.bb
+
 npm:
   npm install
 
@@ -8,7 +11,7 @@ test-clj:
   clojure -A:dev -X cognitect.test-runner.api/test
   clojure -X:dev user/xr! '{:path "check"}'
 
-test: test-cljs test-clj
+test: test-bb test-cljs test-clj
 
 bench:
   clojure -X:dev user/xr! '{:path "bench"}'
