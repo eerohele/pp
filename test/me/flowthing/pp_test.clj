@@ -176,11 +176,11 @@
 
 (deftest pprint-meta
   ;; clojure.pprint prints this incorrectly with meta
-  (is (= "{:a 1}\n"
-        (pp-str (with-meta {:a 1} {:b 2}) :print-meta true :print-readably false)))
+  (binding [*print-meta* true *print-readably* false]
+    (is (= "{:a 1}\n" (pp-str (with-meta {:a 1} {:b 2})))))
 
-  (is (= "{:a 1}\n"
-        (pp-str (with-meta {:a 1} {}) :print-meta true))))
+  (binding [*print-meta* true]
+    (is (= "{:a 1}\n" (pp-str (with-meta {:a 1} {}))))))
 
 (defrecord R [x])
 
@@ -195,15 +195,15 @@
 (deftest pprint-reader-macro-edge-cases
   ;; do not print the reader macro character if the collection following the
   ;; character exceeds print level
-  (is (= "#\n" (pp-str '('#{boolean char floats}) :print-level 0)))
-  (is (= "(#)\n" (pp-str '('#{boolean char floats}) :print-level 1)))
-  (is (= "(#)\n" (pp-str '('#{boolean char floats}) :print-length 1 :print-level 1)))
+  (is (= "#\n" (binding [*print-level* 0] (pp-str '('#{boolean char floats})))))
+  (is (= "(#)\n" (binding [*print-level* 1] (pp-str '('#{boolean char floats})))))
+  (is (= "(#)\n" (binding [*print-length* 1 *print-level* 1] (pp-str '('#{boolean char floats})))))
 
   ;; reader macro characters do not count towards *print-length*
   (is (= "(...)\n"
-        (pp-str '('#{boolean char floats}) :print-length 0)))
+        (binding [*print-length* 0] (pp-str '('#{boolean char floats})))))
   (is (= "('#{boolean ...})\n"
-        (pp-str '('#{boolean char floats})) :print-length 1)))
+        (binding [*print-length* 1] (pp-str '('#{boolean char floats}))))))
 
 (deftest map-entry-separator
   (is (= "{:a 1, :b 2}\n" (pp-str {:a 1 :b 2})))
@@ -226,7 +226,9 @@
   (is (re-matches obj-re (with-out-str (prn (T. {:a 1})))))
   (is (re-matches obj-re (with-out-str (cpp/pprint (T. {:a 1})))))
   (is (re-matches obj-re (pp-str (T. {:a 1}))))
-  (is (re-matches obj-re (pp-str (T. {:a 1}) :print-level 0))))
+
+  (binding [*print-level* 0]
+    (is (re-matches obj-re (pp-str (T. {:a 1}))))))
 
 (deftest pprint-dup
   (binding [*print-dup* true]
