@@ -4,6 +4,9 @@
 (require '[fipp.edn :as fipp])
 (require '[me.flowthing.pp :as pp])
 
+(set! *print-length* nil)
+(set! *print-level* nil)
+
 ;; Benchmarks
 
 ;; Fipp
