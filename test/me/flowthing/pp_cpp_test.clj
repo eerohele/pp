@@ -3,6 +3,13 @@
             [time-literals.read-write :as time-literals]
             [me.flowthing.pp.test :refer [$]]))
 
+;; This namespace is a holdover from the time when pp only supported Clojure.
+;; It compares the output of clojure.pprint/pprint to the output of
+;; me.flowthing.pp/pprint.
+;;
+;; It is largely superseded by me.flowthing.pp-test, and is probably OK to
+;; remove.
+
 (time-literals/print-time-literals-clj!)
 
 (comment ($ {:a 1}) ,,,)
