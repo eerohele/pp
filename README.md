@@ -10,13 +10,14 @@
        \/__/         \/__/
 ```
 
-A fast, single-namespace, no-dependency Clojure pretty-printer for
-data (not code).
+A fast, single-namespace, no-dependency pretty-printer for data (not code).
+
+Supports [Clojure](https://clojure.org), [ClojureScript](https://clojurescript.org), and [Babashka](https://babashka.org).
 
 ## Features
 
-- [Fast](https://github.com/eerohele/pp/actions/workflows/bench.yaml) (~14x-10x faster than [`fipp.edn/pprint`](https://github.com/brandonbloom/fipp) and ~85x–16x faster than [`clojure.pprint/pprint`](https://clojure.github.io/clojure/clojure.pprint-api.html#clojure.pprint/pprint) at Fipp's benchmark)
-- [Small](https://github.com/eerohele/pp/blob/main/src/me/flowthing/pp.clj) (under ~350 lines of code, not counting comments)
+- [Fast](https://github.com/eerohele/pp/actions/workflows/bench.yaml)[^1] (~14x-10x faster than [`fipp.edn/pprint`](https://github.com/brandonbloom/fipp) and ~85x–16x faster than [`clojure.pprint/pprint`](https://clojure.github.io/clojure/clojure.pprint-api.html#clojure.pprint/pprint) at Fipp's benchmark)
+- [Small](https://github.com/eerohele/pp/blob/main/src/me/flowthing/pp.cljc) (under ~450 lines of code, not counting comments)
 - Zero dependencies
 - Single namespace; either use as a dependency or vendor into your codebase
 - Output [similar](#differences-to-clojurepprint) to `clojure.pprint/pprint`
@@ -33,8 +34,8 @@ data (not code).
 
 Either:
 
-- Copy [`src/me/flowthing/pp.clj`](https://github.com/eerohele/pp/blob/main/src/me/flowthing/pp.clj) into your codebase and rename the namespace to avoid conflicts, or:
-- Pull it in as a Maven dep or a [Git dep](https://clojure.org/reference/deps_and_cli#_git):
+- Copy [`src/me/flowthing/pp.cljc`](https://github.com/eerohele/pp/blob/main/src/me/flowthing/pp.cljc) into your codebase and rename the namespace to avoid conflicts, or:
+- Pull in via Maven or [Git](https://clojure.org/reference/deps_and_cli#_git):
 
     ```clojure
     ;; Maven coordinates
@@ -99,6 +100,10 @@ In addition, there are one or two other minor, insignificant differences in wher
 - pp uses `print-method` for pretty much everything except Clojure's built-in collection types. This means pp, unlike Fipp, prints things like [time-literals](https://github.com/henryw374/time-literals) the same way as `clojure.pprint/pprint`.
 - Fipp prints `(fipp.edn/pprint '@foo)` as `(clojure.core/deref foo)`; pp, like `clojure.pprint/pprint`, prints it as `@foo`. The same with `quote`/`'`,  `var`/`#'`, and `unquote`/`~`.
 
+## Notes on ClojureScript support
+
+- ClojureScript doesn't support `*print-dup*`, so neither does pp.
+
 ## Applications
 
 - [Tutkain](https://github.com/eerohele/Tutkain) uses pp to pretty-print evaluation results.
@@ -108,3 +113,5 @@ In addition, there are one or two other minor, insignificant differences in wher
 ## Acknowledgements
 
 The algorithm pp uses is based on the ideas in [*Pretty-Printing, Converting List to Linear Structure*](https://dspace.mit.edu/handle/1721.1/5797) by Ira Goldstein (Artificial Intelligence, Memo No. 279 in Massachusetts Institute of Technology A.I. Laboratory, February 1973).
+
+[^1]: I have only benchmarked the Clojure implementation. Cursory testing with [`simple-benchmark`](https://cljs.github.io/api/cljs.core/simple-benchmark) shows a ~6x improvement over [`cljs.pprint/pprint`](https://cljs.github.io/api/cljs.pprint/#pprint), but grain of salt and all that.
