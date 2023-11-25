@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
   ```
 
 - Fix reader macro edge case
+- Slightly improved performance
 
 ## 2023-10-05.5
 
