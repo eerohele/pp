@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## UNRELEASED
+## 2023-11-25.47
 
 - Fix `*flush-on-newline*` behavior
 
