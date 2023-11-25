@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## UNRELEASED
 
+- Fix `*flush-on-newline*` behavior
+
+  If `*flush-on-newline` is set to `true` (the default), like clojure.pprint, pp now only flushes after pretty-printing the entire form, instead of flushing after every newline.
+
 - Add Maven (Clojars) release
 - Add ClojureScript support
 - Add explicit (unit tested) Babashka support

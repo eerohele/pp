@@ -64,9 +64,7 @@
     "Write a newline into the underlying java.io.Writer.
 
     Resets the number of characters allotted to the current line to
-    zero.
-
-    If *flush-on-newline* is true, flushes the underlying writer."))
+    zero."))
 
 (defn ^:private write-into
   "Given a writer (java.io.Writer or cljs.core.IWriter) and a string,
@@ -103,10 +101,6 @@
         (- max-width @c))
       (nl [_]
         (write-into writer "\n")
-
-        (when *flush-on-newline*
-          #?(:clj (.flush ^java.io.Writer writer) :cljs (-flush writer)))
-
         (vreset! c 0)
         nil))))
 
@@ -584,7 +578,9 @@
             (do
               (print-dup x writer)
               (.write ^java.io.Writer writer "\n"))
-            (pp writer)))
+            (pp writer))
+
+          (when *flush-on-newline* (.flush ^java.io.Writer writer)))
 
         :cljs
         (if writer
@@ -598,4 +594,5 @@
           (let [sb (goog.string.StringBuffer.)
                 writer (StringBufferWriter. sb)]
             (pp writer)
-            (-> sb str string-print)))))))
+            (-> sb str string-print)
+            (when *flush-on-newline* (-flush writer))))))))
