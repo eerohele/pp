@@ -28,7 +28,7 @@
 (quick-bench
   (binding [*out* null-writer] (fipp/pprint numbers {:width 72})))
 
-'tutkain.impl.pprint/pprint
+'me.flowthing.pp/pprint
 (quick-bench
   (pp/pprint null-writer numbers {:max-width 72}))
 
@@ -54,7 +54,7 @@
 (quick-bench
   (binding [*out* null-writer] (fipp/pprint code {:width 72})))
 
-'tutkain.impl.pprint/pprint
+'me.flowthing.pp/pprint
 (quick-bench
   (pp/pprint null-writer code {:max-width 72}))
 
