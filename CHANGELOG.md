@@ -22,7 +22,7 @@ All notable changes to this project will be documented in this file.
   If `*flush-on-newline` is set to `true` (the default), like clojure.pprint, pp now only flushes after pretty-printing the entire form, instead of flushing after every newline.
 
 - Fix reader macro edge case
-- Slightly improved performance
+- [Slightly improved performance](https://github.com/eerohele/pp/actions/runs/6990886744/job/19020851938#step:6:202)
 
 ## 2023-10-05.5
 
