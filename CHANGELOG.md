@@ -5,7 +5,8 @@ All notable changes to this project will be documented in this file.
 ## UNRELEASED
 
 - Add Maven (Clojars) release
-- Fix reader macro edge case
+- Add ClojureScript support
+- Add explicit (unit tested) Babashka support
 - Add `:map-entry-separator` option
 
   The `:map-entry-separator` option lets you tell pp not to print
@@ -16,6 +17,8 @@ All notable changes to this project will be documented in this file.
   {:a 1 :b 2}
   nil
   ```
+
+- Fix reader macro edge case
 
 ## 2023-10-05.5
 
