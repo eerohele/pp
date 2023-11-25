@@ -16,6 +16,6 @@ test: test-bb test-cljs test-clj
 bench:
   clojure -X:dev user/xr! '{:path "bench"}'
 
-release:
+release: test
   clojure -T:build release
   mvn deploy
