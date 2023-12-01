@@ -16,7 +16,7 @@ Supports [Clojure](https://clojure.org), [ClojureScript](https://clojurescript.o
 
 ## Features
 
-- [Fast](https://github.com/eerohele/pp/actions/workflows/bench.yaml)[^1] (~14x-10x faster than [`fipp.edn/pprint`](https://github.com/brandonbloom/fipp) and ~85x–16x faster than [`clojure.pprint/pprint`](https://clojure.github.io/clojure/clojure.pprint-api.html#clojure.pprint/pprint) at Fipp's benchmark)
+- [Fast](https://github.com/eerohele/pp/actions/workflows/bench.yml)[^1] (~14x-10x faster than [`fipp.edn/pprint`](https://github.com/brandonbloom/fipp) and ~85x–16x faster than [`clojure.pprint/pprint`](https://clojure.github.io/clojure/clojure.pprint-api.html#clojure.pprint/pprint) at Fipp's benchmark)
 - [Small](https://github.com/eerohele/pp/blob/main/src/me/flowthing/pp.cljc) (under ~450 lines of code, not counting comments)
 - Zero dependencies
 - Single namespace; either use as a dependency or vendor into your codebase
@@ -109,6 +109,8 @@ In addition, there are one or two other minor, insignificant differences in wher
 - [Tutkain](https://github.com/eerohele/Tutkain) uses pp to pretty-print evaluation results.
 - [Tab](https://github.com/eerohele/tab) uses pp to pretty-print data structures it can't turn into tables.
 - [Lingo](https://github.com/exoscale/lingo)
+- [Metabase](https://github.com/metabase/metabase)
+- [Penpot](https://github.com/penpot/penpot)
 
 ## Acknowledgements
 
