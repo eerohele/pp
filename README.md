@@ -106,8 +106,8 @@ In addition, there are one or two other minor, insignificant differences in wher
 
 ## Applications
 
-- [Tutkain](https://github.com/eerohele/Tutkain) uses pp to pretty-print evaluation results.
-- [Tab](https://github.com/eerohele/tab) uses pp to pretty-print data structures it can't turn into tables.
+- [Tutkain](https://github.com/eerohele/Tutkain)
+- [Tab](https://github.com/eerohele/tab)
 - [Lingo](https://github.com/exoscale/lingo)
 - [Metabase](https://github.com/metabase/metabase)
 - [Penpot](https://github.com/penpot/penpot)
