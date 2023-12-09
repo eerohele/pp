@@ -109,6 +109,7 @@ In addition, there are one or two other minor, insignificant differences in wher
 - [Tutkain](https://github.com/eerohele/Tutkain)
 - [Tab](https://github.com/eerohele/tab)
 - [Lingo](https://github.com/exoscale/lingo)
+- [Bosquet](https://github.com/zmedelis/bosquet)
 - [Metabase](https://github.com/metabase/metabase)
 - [Penpot](https://github.com/penpot/penpot)
 
