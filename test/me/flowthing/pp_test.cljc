@@ -168,7 +168,25 @@
   ;; Symbolic
   (is (= "##Inf\n" (pp ##Inf)))
   (is (= "##-Inf\n" (pp ##-Inf)))
-  (is (= "##NaN\n" (pp ##NaN))))
+  (is (= "##NaN\n" (pp ##NaN)))
+
+  ;; Map entries
+  (is (= "[:a 1]\n" (pp (find {:a 1} :a))))
+  (is (= "#\n" (pp (find {:a 1} :a) :print-level 0)))
+  (is (= "[:a 1]\n" (pp (find {:a 1} :a) :print-level 1)))
+  (is (= "[:a 1]\n" (pp (find {:a 1} :a) :print-length 0)))
+  (is (= "[:a 1]\n" (pp (find {:a 1} :a) :print-length 1)))
+  (is (= "[:a 1]\n" (pp (find {:a 1} :a) :print-level 1 :print-length 0)))
+  (is (= "#\n" (pp (find {[:a 1] [:b 1]} [:a 1]) :print-level 0)))
+  (is (= "#\n" (pp (find {:a 1} :a) :print-level 0 :print-length 1)))
+  (is (= "#\n" (pp (find {[:a 1] [:b 1]} [:a 1]) :print-level 0 :print-length 0)))
+  (is (= "[# #]\n" (pp (find {[:a 1] [:b 1]} [:a 1]) :print-level 1)))
+  (is (= "[# #]\n" (pp (find {[:a 1] [:b 1]} [:a 1]) :print-level 1 :print-length 1)))
+  (is (= "[# #]\n" (pp (find {[:a 1] [:b 1]} [:a 1]) :print-length 0 :print-level 1)))
+  (is (= "[[...] [...]]\n" (pp (find {[:a 1] [:b 1]} [:a 1]) :print-length 0)))
+  (is (= "[[:a ...] [:b ...]]\n" (pp (find {[:a 1] [:b 1]} [:a 1]) :print-length 1)))
+  (is (= "[[:a 1] [:b 1]]\n" (pp (find {[:a 1] [:b 1]} [:a 1]) :print-level 2)))
+  (is (= "[[:a 1] [:b 1]]\n" (pp (find {[:a 1] [:b 1]} [:a 1]) :print-level 3))))
 
 (deftest pprint-meta
   ;; clojure.pprint prints this incorrectly with meta

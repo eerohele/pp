@@ -435,7 +435,10 @@
   (if (meets-print-level? (:level opts))
     (write writer "#")
     (let [k (key this)
-          opts (update opts :level inc)]
+          opts (update opts :level inc)
+          level (:level opts)]
+      (when (= 1 level) (write writer "["))
+
       (-pprint k writer opts)
 
       (let [v (val this)
@@ -447,7 +450,9 @@
             mode (print-mode writer s (inc (:reserve-chars opts)))]
         (write-sep writer mode)
         (when (= :miser mode) (write writer (:indentation opts)))
-        (-pprint v writer opts)))))
+        (-pprint v writer opts))
+
+      (when (= 1 level) (write writer "]")))))
 
 (defn ^:private -pprint-seq
   [this writer opts]

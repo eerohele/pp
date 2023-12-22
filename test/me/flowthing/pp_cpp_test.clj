@@ -143,7 +143,10 @@
   ;; Symbolic
   ($ ##Inf)
   ($ ##-Inf)
-  ($ ##NaN))
+  ($ ##NaN)
+
+  ($ (find {:a 1} :a))
+  ($ (find {[:a 1] [:b 2]} [:a 1])))
 
 (deftest pprint-struct
   ($ (struct (create-struct :q/a :q/b :q/c) 1 2 3)))
