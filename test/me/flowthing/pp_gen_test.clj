@@ -15,6 +15,28 @@
                   *print-dup* print-dup]
           (pp x :map-entry-separator map-entry-separator))))))
 
+(defspec level-zero-map-entry 10000
+  (for-all [max-width gen/nat
+            print-level gen/nat
+            print-length gen/nat
+            {:keys [me v]}
+            (gen/fmap (fn [[k v]] {:me (clojure.lang.MapEntry. k v) :v [k v]})
+              (gen/tuple
+                gen/any-printable-equatable
+                gen/any-printable-equatable))]
+    (= (pp me :max-width max-width :print-level print-level :print-length print-length)
+      (pp v :max-width max-width :print-level print-level :print-length print-length))))
+
+(defspec pp-vs-cpp-map-entry 1000
+  (for-all [print-level gen/nat
+            print-length gen/nat
+            x (gen/fmap (fn [[k v]] (clojure.lang.MapEntry. k v))
+                (gen/tuple
+                  gen/any-printable-equatable
+                  gen/any-printable-equatable))]
+    (= (pp x :max-width ##Inf :print-level print-level :print-length print-length)
+      (cpp x :max-width ##Inf :print-level print-level :print-length print-length))))
+
 (defspec pp-vs-cpp-vec 1000
   (for-all [print-level gen/nat
             print-length gen/nat

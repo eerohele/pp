@@ -146,7 +146,16 @@
   ($ ##NaN)
 
   ($ (find {:a 1} :a))
-  ($ (find {[:a 1] [:b 2]} [:a 1])))
+  ($ (find {[:a 1] [:b 2]} [:a 1]))
+  ($ (find {:a 1} :a) :print-level 0)
+  ($ (find {:a 1} :a) :print-level 1)
+  ($ (find {:a 1} :a) :print-length 0)
+  ($ (find {:a 1} :a) :print-length 1)
+  ($ (find {:a 1} :a) :print-level 0 :print-length 0)
+  ($ (find {:a 1} :a) :print-level 0 :print-length 1)
+  ($ (find {:a 1} :a) :print-level 1 :print-length 0)
+  ($ (find {[:a 1] 1} [:a 1]) :print-level 1 :print-length 0)
+  ($ (find {0 1} 0) :max-width 2))
 
 (deftest pprint-struct
   ($ (struct (create-struct :q/a :q/b :q/c) 1 2 3)))
