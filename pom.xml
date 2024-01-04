@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.flowthing</groupId>
   <artifactId>pp</artifactId>
-  <version>2024-01-04.57</version>
+  <version>2024-01-04.60</version>
   <name>pp</name>
   <build>
     <sourceDirectory>src</sourceDirectory>
