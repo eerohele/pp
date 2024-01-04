@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2024-01-04.57
+
+- Print top-level map entries (`clojure.lang.MapEntry`) like vectors #5
+
+  Prior to this change, pp printed top-level map entries without delimiters:
+
+  ```clojure
+  user=> (pp/pprint (clojure.lang.MapEntry. :a :b))
+  :a :b
+  nil
+  ```
+
+  After:
+
+  ```clojure
+  user=> (pp/pprint (clojure.lang.MapEntry. :a :b))
+  [:a :b]
+  nil
+  ```
+
 ## 2023-11-25.47
 
 - Add ClojureScript support
