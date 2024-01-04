@@ -18,4 +18,4 @@ bench:
 
 release: test
   clojure -T:build release
-  mvn deploy
+  mvn clean deploy
