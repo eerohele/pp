@@ -112,6 +112,7 @@ In addition, there are one or two other minor, insignificant differences in wher
 - [Bosquet](https://github.com/zmedelis/bosquet)
 - [Metabase](https://github.com/metabase/metabase)
 - [Penpot](https://github.com/penpot/penpot)
+- [Fireworks](https://github.com/paintparty/fireworks)
 
 ## Acknowledgements
 
