@@ -356,6 +356,15 @@
           (-pprint m writer opts))
         (write-sep writer mode)))))
 
+(defn ^:private pprint-opts
+  [open-delim opts]
+  (let [;; The indentation level is the indentation level of the
+        ;; parent S-expression plus a number of spaces equal to the
+        ;; length of the open delimiter (e.g. one for "(", two for
+        ;; "#{").
+        indentation (str (:indentation opts) (.repeat " " (strlen open-delim)))]
+    (-> opts (assoc :indentation indentation) (update :level inc))))
+
 (defn ^:private -pprint-coll
   "Like -pprint, but only for built-in colls (lists, maps, vectors, and
   sets)."
@@ -366,12 +375,6 @@
 
           [^String o form] (open-delim+form this)
 
-          ;; The indentation level is the indentation level of the
-          ;; parent S-expression plus a number of spaces equal to the
-          ;; length of the open delimiter (e.g. one for "(", two for
-          ;; "#{").
-          indentation (str (:indentation opts) (.repeat " " (strlen o)))
-
           ;; If, after (possibly) reserving space for any closing
           ;; delimiters of ancestor S-expressions, there's enough space
           ;; to print the entire form in linear style on this line, do
@@ -380,9 +383,7 @@
           ;; Otherwise, print the form in miser style.
           mode (print-mode writer s (:reserve-chars opts))
 
-          opts (-> opts
-                 (assoc :indentation indentation)
-                 (update :level inc))]
+          opts (pprint-opts o opts)]
 
       ;; Print possible meta
       (pprint-meta form writer opts mode)
@@ -397,7 +398,7 @@
           (loop [form form index 0]
             (if (= index *print-length*)
               (do
-                (when (= mode :miser) (write writer indentation))
+                (when (= mode :miser) (write writer (:indentation opts)))
                 (write writer "..."))
 
               (do
@@ -406,7 +407,7 @@
                 ;; indentation for the first form, because it
                 ;; immediately follows the open delimiter.
                 (when (and (= mode :miser) (pos? index))
-                  (write writer indentation))
+                  (write writer (:indentation opts)))
 
                 (let [f (first form)
                       n (next form)]
