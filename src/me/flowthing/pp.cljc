@@ -130,6 +130,11 @@
   [coll]
   (if (record? coll)
     [(str "#" (record-name coll) "{") coll]
+    ;; If all keys in the map share a namespace and *print-
+    ;; namespace-maps* is true, print the map using map namespace
+    ;; syntax (e.g. #:a{:b 1} instead of {:a/b 1}). If the map is
+    ;; a record, print the map using the record syntax (e.g.
+    ;; #user.R{:x 1}).
     (let [[ns ns-map]
           (when (and *print-namespace-maps* (map? coll))
             (extract-map-ns coll))
@@ -359,11 +364,6 @@
     (write writer "#")
     (let [s (print-linear this opts)
 
-          ;; If all keys in the map share a namespace and *print-
-          ;; namespace-maps* is true, print the map using map namespace
-          ;; syntax (e.g. #:a{:b 1} instead of {:a/b 1}). If the map is
-          ;; a record, print the map using the record syntax (e.g.
-          ;; #user.R{:x 1}).
           [^String o form] (open-delim+form this)
 
           ;; The indentation level is the indentation level of the
