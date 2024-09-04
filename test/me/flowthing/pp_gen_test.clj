@@ -27,6 +27,19 @@
     (= (pp me :max-width max-width :print-level print-level :print-length print-length)
       (pp v :max-width max-width :print-level print-level :print-length print-length))))
 
+(defspec non-map-coll-map-entry 250
+  (let [me-g (gen/fmap (fn [[k v]] (clojure.lang.MapEntry. k v))
+               (gen/tuple
+                 gen/any-printable-equatable
+                 gen/any-printable-equatable))]
+    (for-all [print-level gen/nat
+              print-length gen/nat
+              xs (gen/one-of [(gen/vector me-g 1 8)
+                              (gen/fmap seq (gen/vector me-g 1 8))
+                              (gen/set me-g {:min-elements 1 :max-elements 8})])]
+      (= (pp xs :max-width ##Inf :print-level print-level :print-length print-length)
+        (cpp xs :max-width ##Inf :print-level print-level :print-length print-length)))))
+
 (defspec pp-vs-cpp-map-entry 1000
   (for-all [print-level gen/nat
             print-length gen/nat

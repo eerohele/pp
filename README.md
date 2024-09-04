@@ -17,7 +17,7 @@ Supports [Clojure](https://clojure.org), [ClojureScript](https://clojurescript.o
 ## Features
 
 - [Fast](https://github.com/eerohele/pp/actions/workflows/bench.yml)[^1] (~14x-10x faster than [`fipp.edn/pprint`](https://github.com/brandonbloom/fipp) and ~85x–16x faster than [`clojure.pprint/pprint`](https://clojure.github.io/clojure/clojure.pprint-api.html#clojure.pprint/pprint) at Fipp's benchmark)
-- [Small](https://github.com/eerohele/pp/blob/main/src/me/flowthing/pp.cljc) (under ~450 lines of code, not counting comments)
+- [Small](https://github.com/eerohele/pp/blob/main/src/me/flowthing/pp.cljc) (under ~500 lines of code, not counting comments)
 - Zero dependencies
 - Single namespace; either use as a dependency or vendor into your codebase
 - Output [similar](#differences-to-clojurepprint) to `clojure.pprint/pprint`

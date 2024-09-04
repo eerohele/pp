@@ -172,6 +172,9 @@
 
   ;; Map entries
   (is (= "[:a 1]\n" (pp (find {:a 1} :a))))
+  (is (= "[[:a 1]]\n" (pp [(find {:a 1} :a)])))
+  (is (= "([:a 1])\n" (pp (list (find {:a 1} :a)))))
+  (is (= "#{[:a 1]}\n" (pp #{(find {:a 1} :a)})))
   (is (= "#\n" (pp (find {:a 1} :a) :print-level 0)))
   (is (= "[:a 1]\n" (pp (find {:a 1} :a) :print-level 1)))
   (is (= "[...]\n" (pp (find {:a 1} :a) :print-length 0)))

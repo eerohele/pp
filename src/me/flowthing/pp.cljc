@@ -165,9 +165,41 @@
         :level (long, default: 0)
           The current nesting level.")))
 
+(defn ^:private -print-map-entry
+  "Print a map entry within a map."
+  [this writer opts]
+  (if (meets-print-level? (:level opts))
+    (write-into writer "#")
+    (let [opts (update opts :level inc)]
+      (-print (key this) writer opts)
+      (write-into writer " ")
+      (-print (val this) writer opts))))
+
+(defn ^:private -print-map
+  "Like -print, but only for maps."
+  [coll writer opts]
+  (if (meets-print-level? (:level opts 0))
+    (write-into writer "#")
+
+    (let [[^String o form] (open-delim+form coll)]
+      (write-into writer o)
+
+      (when (seq form)
+        (loop [form form index 0]
+          (if (= index *print-length*)
+            (write-into writer "...")
+            (let [f (first form)
+                  n (next form)]
+              (-print-map-entry f writer (update opts :level inc))
+              (when-not (empty? n)
+                (write-into writer ^String (:map-entry-separator opts))
+                (write-into writer " ")
+                (recur n (inc index)))))))
+
+      (write-into writer (close-delim form)))))
+
 (defn ^:private -print-coll
-  "Like -print, but only for built-in colls (lists, maps, vectors, and
-  sets)."
+  "Like -print, but only for lists, vectors, and sets."
   [coll writer opts]
   (if (meets-print-level? (:level opts 0))
     (write-into writer "#")
@@ -183,27 +215,10 @@
                   n (next form)]
               (-print f writer (update opts :level inc))
               (when-not (empty? n)
-                (when (map-entry? f)
-                  (write-into writer ^String (:map-entry-separator opts)))
                 (write-into writer " ")
                 (recur n (inc index)))))))
 
       (write-into writer (close-delim form)))))
-
-(defn ^:private -print-map-entry
-  [this writer opts]
-  (cond
-    (meets-print-level? (:level opts))
-    (write-into writer "#")
-
-    (zero? (:level opts))
-    (-print-coll this writer opts)
-
-    :else
-    (let [opts (update opts :level inc)]
-      (-print (key this) writer opts)
-      (write-into writer " ")
-      (-print (val this) writer opts))))
 
 (defn ^:private -print-seq
   [this writer opts]
@@ -225,13 +240,16 @@
        (nil? this)
        (write-into writer "nil")
 
-       (map-entry? this)
-       (-print-map-entry this writer opts)
-
        (seq? this)
        (-print-seq this writer opts)
 
-       (or (map? this) (vector? this) (set? this))
+       (map? this)
+       (-print-map this writer opts)
+
+       (vector? this)
+       (-print-coll this writer opts)
+
+       (set? this)
        (-print-coll this writer opts)
 
        :else (write-into writer (pr-str this))))
@@ -244,7 +262,7 @@
 
      clojure.lang.AMapEntry
      (-print [this writer opts]
-       (-print-map-entry this writer opts))
+       (-print-coll this writer opts))
 
      clojure.lang.ISeq
      (-print [this writer opts]
@@ -252,7 +270,7 @@
 
      clojure.lang.IPersistentMap
      (-print [this writer opts]
-       (-print-coll this writer opts))
+       (-print-map this writer opts))
 
      clojure.lang.IPersistentVector
      (-print [this writer opts]
@@ -372,8 +390,7 @@
     (-> opts (assoc :indentation indentation) (update :level inc))))
 
 (defn ^:private -pprint-coll
-  "Like -pprint, but only for built-in colls (lists, maps, vectors, and
-  sets)."
+  "Like -pprint, but only for lists, vectors and sets."
   [this writer opts]
   (if (meets-print-level? (:level opts))
     (write writer "#")
@@ -407,22 +424,11 @@
 
                 (let [f (first form)
                       n (next form)]
-                  (cond
-                    (empty? n)
+                  (if (empty? n)
                     ;; This is the last child, so reserve an additional
                     ;; slot for the closing delimiter of the parent
                     ;; S-expression.
                     (-pprint f writer (update opts :reserve-chars inc))
-
-                    (map-entry? f)
-                    (let [^String map-entry-separator (:map-entry-separator opts)]
-                      ;; Reserve a slot for the map entry separator.
-                      (-pprint f writer (assoc opts :reserve-chars (strlen map-entry-separator)))
-                      (write writer map-entry-separator)
-                      (write-sep writer mode)
-                      (recur n (inc index)))
-
-                    :else
                     (do
                       (-pprint f writer (assoc opts :reserve-chars 0))
                       (write-sep writer mode)
@@ -432,35 +438,58 @@
       (write writer (close-delim form)))))
 
 (defn ^:private -pprint-map-entry
+  "Pretty-print a map entry within a map."
   [this writer opts]
-  ;; We have to special-case map entries because they normally print
-  ;; like vectors (e.g. [:a 1]), but we don't want to print those
-  ;; square brackets.
-  ;;
-  ;; Additionally, we want to keep the key and the value on the same
-  ;; line whenever we can.
-  (cond
-    (meets-print-level? (:level opts))
+  (if (meets-print-level? (:level opts))
     (write writer "#")
+    (let [k (key this)
+          opts (update opts :level inc)]
+      (-pprint k writer opts)
 
-    (zero? (:level opts))
-    (-pprint-coll this writer opts)
+      (let [v (val this)
+            ;; If, after writing the map entry key, there's enough space to
+            ;; write the val on the same line, do so. Otherwise, write
+            ;; indentation followed by val on the following line.
+            mode (print-mode writer v (update opts :reserve-chars inc))]
+        (write-sep writer mode)
+        (when (= :miser mode) (write writer (:indentation opts)))
+        (-pprint v writer opts)))))
 
-    :else
-    (if (meets-print-level? (:level opts))
-      (write writer "#")
-      (let [k (key this)
-            opts (update opts :level inc)]
-        (-pprint k writer opts)
+(defn ^:private -pprint-map
+  "Like -pprint, but only for maps."
+  [this writer opts]
+  (if (meets-print-level? (:level opts))
+    (write writer "#")
+    (let [[^String o form] (open-delim+form this)
+          mode (print-mode writer this opts)
+          opts (pprint-opts o opts)]
+      (pprint-meta form writer opts mode)
+      (write writer o)
+      (if (= *print-length* 0)
+        (write writer "...")
+        (when (seq form)
+          (loop [form form index 0]
+            (if (= index *print-length*)
+              (do
+                (when (= mode :miser) (write writer (:indentation opts)))
+                (write writer "..."))
 
-        (let [v (val this)
-              ;; If, after writing the map entry key, there's enough space to
-              ;; write the val on the same line, do so. Otherwise, write
-              ;; indentation followed by val on the following line.
-              mode (print-mode writer v (update opts :reserve-chars inc))]
-          (write-sep writer mode)
-          (when (= :miser mode) (write writer (:indentation opts)))
-          (-pprint v writer opts))))))
+              (do
+                (when (and (= mode :miser) (pos? index))
+                  (write writer (:indentation opts)))
+
+                (let [f (first form)
+                      n (next form)]
+                  (if (empty? n)
+                    (-pprint-map-entry f writer (update opts :reserve-chars inc))
+                    (let [^String map-entry-separator (:map-entry-separator opts)]
+                      ;; Reserve a slot for the map entry separator.
+                      (-pprint-map-entry f writer (assoc opts :reserve-chars (strlen map-entry-separator)))
+                      (write writer map-entry-separator)
+                      (write-sep writer mode)
+                      (recur n (inc index))))))))))
+
+      (write writer (close-delim form)))))
 
 (defn ^:private -pprint-seq
   [this writer opts]
@@ -489,16 +518,19 @@
        (nil? this)
        (write writer "nil")
 
-       (map-entry? this)
-       (-pprint-map-entry this writer opts)
-
        (instance? cljs.core.PersistentQueue this)
        (-pprint-queue this writer opts)
 
        (seq? this)
        (-pprint-seq this writer opts)
 
-       (or (map? this) (vector? this) (set? this))
+       (map? this)
+       (-pprint-map this writer opts)
+
+       (vector? this)
+       (-pprint-coll this writer opts)
+
+       (set? this)
        (-pprint-coll this writer opts)
 
        :else (write writer (print-linear this opts))))
@@ -511,7 +543,7 @@
 
      clojure.lang.AMapEntry
      (-pprint [this writer opts]
-       (-pprint-map-entry this writer opts))
+       (-pprint-coll this writer opts))
 
      clojure.lang.ISeq
      (-pprint [this writer opts]
@@ -519,7 +551,7 @@
 
      clojure.lang.IPersistentMap
      (-pprint [this writer opts]
-       (-pprint-coll this writer opts))
+       (-pprint-map this writer opts))
 
      clojure.lang.IPersistentVector
      (-pprint [this writer opts]
