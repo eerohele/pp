@@ -306,13 +306,19 @@
    (-print form writer opts)))
 
 (defn ^:private print-mode
-  "Given a CountKeepingWriter, a string representation of a form, and a
-  number of characters to reserve for closing delimiters, return a
-  keyword indicating a printing mode (:linear or :miser)."
-  [writer ^String s reserve-chars]
-  (if (<= (strlen s) (- (remaining writer) reserve-chars))
-    :linear
-    :miser))
+  "Given a CountKeepingWriter, a form, and an options map, return a keyword
+  indicating a printing mode (:linear or :miser)."
+  [writer form opts]
+  (let [reserve-chars (:reserve-chars opts)
+        s (print-linear form opts)]
+    ;; If, after (possibly) reserving space for any closing delimiters of
+    ;; ancestor S-expressions, there's enough space to print the entire
+    ;; form in linear style on this line, do so.
+    ;;
+    ;; Otherwise, print the form in miser style.
+    (if (<= (strlen s) (- (remaining writer) reserve-chars))
+      :linear
+      :miser)))
 
 (defn ^:private write-sep
   "Given a CountKeepingWriter and a printing mode, print a separator (a
@@ -371,18 +377,8 @@
   [this writer opts]
   (if (meets-print-level? (:level opts))
     (write writer "#")
-    (let [s (print-linear this opts)
-
-          [^String o form] (open-delim+form this)
-
-          ;; If, after (possibly) reserving space for any closing
-          ;; delimiters of ancestor S-expressions, there's enough space
-          ;; to print the entire form in linear style on this line, do
-          ;; so.
-          ;;
-          ;; Otherwise, print the form in miser style.
-          mode (print-mode writer s (:reserve-chars opts))
-
+    (let [[^String o form] (open-delim+form this)
+          mode (print-mode writer this opts)
           opts (pprint-opts o opts)]
 
       ;; Print possible meta
@@ -458,11 +454,10 @@
         (-pprint k writer opts)
 
         (let [v (val this)
-              s (print-linear v opts)
               ;; If, after writing the map entry key, there's enough space to
               ;; write the val on the same line, do so. Otherwise, write
               ;; indentation followed by val on the following line.
-              mode (print-mode writer s (inc (:reserve-chars opts)))]
+              mode (print-mode writer v (update opts :reserve-chars inc))]
           (write-sep writer mode)
           (when (= :miser mode) (write writer (:indentation opts)))
           (-pprint v writer opts))))))
