@@ -340,6 +340,17 @@
           The number of characters reserved for closing delimiters of
           S-expressions above the current nesting level.")))
 
+(defn ^:private pprint-meta
+  [form writer opts mode]
+  (when (and *print-meta* *print-readably*)
+    (when-some [m (meta form)]
+      (when (seq m)
+        (write writer "^")
+        ;; As per https://github.com/clojure/clojure/blob/6975553804b0f8da9e196e6fb97838ea4e153564/src/clj/clojure/core_print.clj#L78-L80
+        (let [m (if (and (= (count m) 1) (:tag m)) (:tag m) m)]
+          (-pprint m writer opts))
+        (write-sep writer mode)))))
+
 (defn ^:private -pprint-coll
   "Like -pprint, but only for built-in colls (lists, maps, vectors, and
   sets)."
@@ -374,14 +385,7 @@
                  (update :level inc))]
 
       ;; Print possible meta
-      (when (and *print-meta* *print-readably*)
-        (when-some [m (meta form)]
-          (when (seq m)
-            (write writer "^")
-            ;; As per https://github.com/clojure/clojure/blob/6975553804b0f8da9e196e6fb97838ea4e153564/src/clj/clojure/core_print.clj#L78-L80
-            (let [m (if (and (= (count m) 1) (:tag m)) (:tag m) m)]
-              (-pprint m writer opts))
-            (write-sep writer mode))))
+      (pprint-meta form writer opts mode)
 
       ;; Print open delimiter
       (write writer o)
