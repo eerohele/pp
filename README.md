@@ -10,6 +10,8 @@
        \/__/         \/__/
 ```
 
+[![0 dependencies!](https://0dependencies.dev/0dependencies.svg)](https://0dependencies.dev)
+
 A fast, single-namespace, no-dependency pretty-printer for data (not code).
 
 Supports [Clojure](https://clojure.org), [ClojureScript](https://clojurescript.org), and [Babashka](https://babashka.org).
