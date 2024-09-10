@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2024-09-09.69
+
+- Print map entries (`clojure.lang.MapEntry`) like vectors everywhere except within maps #6
+
 ## 2024-01-04.60
 
 - Print top-level map entries (`clojure.lang.MapEntry`) like vectors #5
