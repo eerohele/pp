@@ -117,6 +117,8 @@ In addition, there are one or two other minor, insignificant differences in wher
 - [Metabase](https://github.com/metabase/metabase)
 - [Penpot](https://github.com/penpot/penpot)
 - [Fireworks](https://github.com/paintparty/fireworks)
+- [Kushi](https://github.com/kushidesign/kushi)
+- [Yetti](https://github.com/funcool/yetti)
 
 ## Acknowledgements
 
