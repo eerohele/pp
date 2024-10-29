@@ -66,6 +66,8 @@ nil
 ## API
 
 ```clojure
+user=> (require '[me.flowthing.pp :as pp])
+nil
 user=> (clojure.repl/doc pp/pprint)
 ...
 ```
