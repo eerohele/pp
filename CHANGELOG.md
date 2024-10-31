@@ -15,6 +15,8 @@ All notable changes to this project will be documented in this file.
   [\p \p]
   ```
 
+- Improve performance (by avoiding boxed math)
+
 ## 2024-09-09.69
 
 - Print map entries (`clojure.lang.MapEntry`) like vectors everywhere except within maps #6
