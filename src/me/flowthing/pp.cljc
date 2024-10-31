@@ -9,7 +9,10 @@
    :license "MIT"
    :git/url "https://github.com/eerohele/pp.git"})
 
-#?(:clj (set! *warn-on-reflection* true))
+#?(:clj
+   (do
+     (set! *warn-on-reflection* true)
+     (set! *unchecked-math* :warn-on-boxed)))
 
 (defn ^:private strip-ns
   "Given a (presumably qualified) ident, return an unqualified version
@@ -83,7 +86,7 @@
   "Given a string, return the length of the string.
 
   Since java.lang.String isn't counted?, (.length s) is faster than (count s)."
-  [s]
+  ^long [s]
   #?(:clj (.length ^String s) :cljs (.-length s)))
 
 (defn ^:private count-keeping-writer
@@ -101,10 +104,10 @@
     (reify CountKeepingWriter
       (write [_ s]
         (write-into writer ^String s)
-        (vswap! c #(+ % (strlen ^String s)))
+        (vswap! c (fn [^long n] (unchecked-add-int n (strlen ^String s))))
         nil)
       (remaining [_]
-        (- max-width @c))
+        (unchecked-subtract-int max-width @c))
       (nl [_]
         (write-into writer "\n")
         (vreset! c 0)
@@ -342,7 +345,7 @@
     ;; form in linear style on this line, do so.
     ;;
     ;; Otherwise, print the form in miser style.
-    (if (<= (strlen s) (- (remaining writer) reserve-chars))
+    (if (<= (strlen s) (unchecked-subtract-int (remaining writer) reserve-chars))
       :linear
       :miser)))
 
@@ -616,7 +619,15 @@
 
    (letfn
      [(pp [writer]
-        (let [writer (count-keeping-writer writer {:max-width max-width})]
+        ;; Allowing ##Inf was a mistake, because it's a double.
+        ;;
+        ;; If the user passes ##Inf, convert it to Integer/MAX_VALUE, which is
+        ;; functionally the same in this case.
+        (let [max-width (case max-width
+                          ##Inf #?(:clj Integer/MAX_VALUE
+                                   :cljs js/Number.MAX_SAFE_INTEGER)
+                          max-width)
+              writer (count-keeping-writer writer {:max-width max-width})]
           (-pprint x writer
             (assoc opts
               :map-entry-separator map-entry-separator
