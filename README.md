@@ -97,6 +97,15 @@ user=> (clojure.pprint/pprint (->R 1))
 nil
 ```
 
+Furthermore, `clojure.pprint/pprint` prints Java arrays with commas, pp prints them without:
+
+```clojure
+user=> (clojure.pprint/pprint (char-array [\c \p \p]))
+[\c, \p, \p]
+user=> (me.flowthing.pp/pprint (char-array [\p \p]))
+[\p \p]
+```
+
 In addition, there are one or two other minor, insignificant differences in where `clojure.pprint/pprint` and pp insert line breaks. If you spot these and they bother you, file an issue.
 
 ## Differences to Fipp
