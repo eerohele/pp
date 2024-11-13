@@ -101,3 +101,21 @@
             print-readably gen/boolean]
     (or (= x print-readably-edge-case)
       (= (pp x :print-readably print-readably) (cpp x :print-readably print-readably)))))
+
+(defspec print-arrays 1000
+  (for-all [booleans (gen/vector gen/boolean)
+            bytes (gen/vector gen/byte)
+            chars (gen/vector gen/char)
+            doubles (gen/vector gen/double)
+            ints (gen/vector gen/small-integer)
+            longs (gen/vector gen/large-integer)
+            objects (gen/vector gen/any-printable-equatable 1 10)]
+    ;; pp prints Java arrays the same way as vectors.
+    (and
+      (= (pp booleans) (pp (boolean-array booleans)))
+      (= (pp bytes) (pp (byte-array bytes)))
+      (= (pp chars) (pp (char-array chars)))
+      (= (pp doubles) (pp (double-array doubles)))
+      (= (pp ints) (pp (int-array ints)))
+      (= (pp longs) (pp (long-array longs)))
+      (= (pp objects) (pp (object-array objects))))))

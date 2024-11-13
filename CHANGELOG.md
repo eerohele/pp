@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## UNRELEASED
+
+- Improve printing of Java arrays.
+
+  pp now prints Java arrays like clojure.pprint, but without commas:
+
+  ```clojure
+  user=> (clojure.pprint/pprint (char-array [\c \p \p]))
+  [\c, \p, \p]
+  user=> (me.flowthing.pp/pprint (char-array [\p \p]))
+  [\p \p]
+  ```
+
 ## 2024-09-09.69
 
 - Print map entries (`clojure.lang.MapEntry`) like vectors everywhere except within maps #6
