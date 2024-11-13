@@ -145,6 +145,7 @@
   ($ ##-Inf)
   ($ ##NaN)
 
+  ;; Map entries
   ($ (find {:a 1} :a))
   ($ (find {[:a 1] [:b 2]} [:a 1]))
   ($ (find {:a 1} :a) :print-level 0)
