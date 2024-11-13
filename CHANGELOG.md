@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## UNRELEASED
+## 2024-11-13.77
 
 - Improve printing of Java arrays.
 
