@@ -34,6 +34,10 @@
               (recur (rest m) k-ns (assoc nm (strip-ns k) v)))))
         [ns nm]))))
 
+(defmacro ^:private array?
+  [x]
+  `(some-> ~x class .isArray))
+
 (defn ^:private open-delim
   "Return the opening delimiter (a string) of coll."
   ^String [coll]
@@ -41,6 +45,7 @@
     (map? coll) "{"
     (vector? coll) "["
     (set? coll) "#{"
+    (array? coll) "["
     :else "("))
 
 (defn ^:private close-delim
@@ -50,6 +55,7 @@
     (map? coll) "}"
     (vector? coll) "]"
     (set? coll) "}"
+    (array? coll) "]"
     :else ")"))
 
 (defprotocol ^:private CountKeepingWriter
@@ -281,8 +287,10 @@
        (-print-coll this writer opts))
 
      Object
-     (-print [this writer _]
-       (print-method this writer))))
+     (-print [this writer opts]
+       (if (array? this)
+         (-print-seq this writer opts)
+         (print-method this writer)))))
 
 (defn ^:private with-str-writer
   "Given a function, create a java.io.StringWriter (Clojure) or a
@@ -567,7 +575,9 @@
 
      Object
      (-pprint [this writer opts]
-       (write writer (print-linear this opts)))))
+       (if (array? nil)
+         (-pprint-seq this writer opts)
+         (write writer (print-linear this opts))))))
 
 (defn pprint
   "Pretty-print an object.
