@@ -33,12 +33,12 @@
     :max-width 24)
 
   ;; Queues
-  ($ (clojure.lang.PersistentQueue/EMPTY))
-  ($ (conj (clojure.lang.PersistentQueue/EMPTY) 1))
-  ($ (conj (clojure.lang.PersistentQueue/EMPTY) 1 2 3) :print-length 1)
-  ($ (conj (clojure.lang.PersistentQueue/EMPTY) 1 2 3) :print-level 1)
-  ($ (conj (clojure.lang.PersistentQueue/EMPTY) 1 2 3) :print-length 1 :print-level 1)
-  ($ (conj (clojure.lang.PersistentQueue/EMPTY) 1 2 3) :max-width 6)
+  ($ clojure.lang.PersistentQueue/EMPTY)
+  ($ (conj clojure.lang.PersistentQueue/EMPTY 1))
+  ($ (conj clojure.lang.PersistentQueue/EMPTY 1 2 3) :print-length 1)
+  ($ (conj clojure.lang.PersistentQueue/EMPTY 1 2 3) :print-level 1)
+  ($ (conj clojure.lang.PersistentQueue/EMPTY 1 2 3) :print-length 1 :print-level 1)
+  ($ (conj clojure.lang.PersistentQueue/EMPTY 1 2 3) :max-width 6)
 
   ;; Max width
   ($ {:a 1 :b 2 :c 3 :d 4} :max-width 0)

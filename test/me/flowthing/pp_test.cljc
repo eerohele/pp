@@ -12,7 +12,7 @@
 (defn ^:private q
   []
   #?(:cljs #queue []
-     :default (clojure.lang.PersistentQueue/EMPTY)))
+     :default clojure.lang.PersistentQueue/EMPTY))
 
 (deftest pprint
   (is (= "{}\n" (pp {})))
