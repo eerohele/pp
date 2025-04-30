@@ -128,6 +128,7 @@ In addition, there are one or two other minor, insignificant differences in wher
 - [Fireworks](https://github.com/paintparty/fireworks)
 - [Kushi](https://github.com/kushidesign/kushi)
 - [Yetti](https://github.com/funcool/yetti)
+- [Orchard](https://github.com/clojure-emacs/orchard)
 
 ## Acknowledgements
 
