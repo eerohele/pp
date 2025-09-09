@@ -94,7 +94,7 @@
 (def ^:private print-readably-edge-case
   "clojure.pprint prints this differently than prn or pp/pprint, causing the
   generative test below to fail sometimes"
-  (apply str (map char [9 133])))
+  (apply str (map char [9 11 133])))
 
 (defspec print-readably 1000
   (for-all [x (gen/one-of [gen/string (gen/vector gen/char)])
