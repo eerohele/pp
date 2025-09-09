@@ -5,7 +5,7 @@
     "test": "test"
   },
   "devDependencies": {
-    "shadow-cljs": "^3.2.0",
+    "shadow-cljs": "^2.25.8",
     "@js-joda/core": "3.2.0"
   }
 }
