@@ -8,7 +8,8 @@
                 io.github.cognitect-labs/test-runner {:git/tag "v0.5.1" :git/sha "dfb30dd"}
                 fipp/fipp {:mvn/version "0.6.29"}
                 com.widdindustries/time-literals {:mvn/version "0.1.10"}
-                thheller/shadow-cljs {:mvn/version "3.2.0"}}}
+                thheller/shadow-cljs {:mvn/version "3.2.0"}
+                org.clojure/clojurescript {:mvn/version "1.12.42"}}}
 
   :bench
   {:extra-deps {org.clojure/clojure {:mvn/version "1.12.2"}}}
