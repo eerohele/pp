@@ -96,11 +96,12 @@
   generative test below to fail sometimes"
   (apply str (map char [9 11 133])))
 
-(defspec print-readably 1000
+(defspec print-readably 50000
   (for-all [x (gen/one-of [gen/string (gen/vector gen/char)])
             print-readably gen/boolean]
     (or (= x print-readably-edge-case)
-      (= (pp x :print-readably print-readably) (cpp x :print-readably print-readably)))))
+      (= (pp x :print-readably print-readably :max-width ##Inf)
+        (cpp x :print-readably print-readably :max-width ##Inf)))))
 
 (defspec print-arrays 1000
   (for-all [booleans (gen/vector gen/boolean)
