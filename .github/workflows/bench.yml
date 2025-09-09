@@ -32,4 +32,4 @@ jobs:
           key: deps-${{ hashFiles('deps.edn') }}
           restore-keys: deps-
 
-      - run: clojure -X:dev user/xr! '{:path "bench"}'
+      - run: clojure -X:dev:bench user/xr! '{:path "bench"}'

@@ -10,6 +10,9 @@
                 com.widdindustries/time-literals {:mvn/version "0.1.10"}
                 thheller/shadow-cljs {:mvn/version "3.2.0"}}}
 
+  :bench
+  {:extra-deps {org.clojure/clojure {:mvn/version "1.12.2"}}}
+
   :build
   {:deps {io.github.clojure/tools.build {:git/tag "v0.10.10" :git/sha "deedd62"}}
    :ns-default build}}}
