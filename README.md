@@ -10,7 +10,7 @@
        \/__/         \/__/
 ```
 
-[![0 dependencies!](https://0dependencies.dev/0dependencies.svg)](https://0dependencies.dev)
+[![0 dependencies!](https://0dependencies.dev/0dependencies.svg)](https://0dependencies.dev) [![Clojars Project](https://img.shields.io/clojars/v/me.flowthing/pp.svg)](https://clojars.org/me.flowthing/pp)
 
 A fast, single-namespace, no-dependency pretty-printer for data (not code).
 
