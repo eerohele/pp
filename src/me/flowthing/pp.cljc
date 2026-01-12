@@ -322,16 +322,8 @@
        (str sb))))
 
 (defn ^:private print-linear
-  "Print a form in linear style (without regard to line length).
-
-  Given one arg (a form), print the form into a string using the
-  default options.
-
-  Given two args (a form and an options map), print the form into a
-  string using the given options.
-
-  Given three args (a java.io.Writer, a form, and an options map), print
-  the form into the writer using the given options.
+  "Given a form and an options map, print the given form in linear style
+  (without regard to line length).
 
   Options:
 
@@ -340,12 +332,8 @@
 
     :print-meta (boolean, default: true)
       Iff true, print metadata."
-  ([form]
-   (print-linear form nil))
-  (^String [form opts]
-   (with-str-writer (fn [writer] (print-linear writer form opts))))
-  ([writer form opts]
-   (-print form writer opts)))
+  ^String [form opts]
+  (with-str-writer (fn [writer] (-print form writer opts))))
 
 (defn ^:private print-mode
   "Given a CountKeepingWriter, a form, and an options map, return a keyword
