@@ -136,7 +136,7 @@
 
   If the coll is a record, the open delimiter includes the record name
   prefix."
-  [coll opts]
+  [coll]
   (if (record? coll)
     [(str "#" (record-name coll) "{") coll]
     ;; If all keys in the map share a namespace and *print-
@@ -150,8 +150,7 @@
 
           coll (if ns ns-map coll)
 
-          o (if ns (str "#:" ns "{") (open-delim coll))
-          o (if (opts :meta-map?) (str "^" o) o)]
+          o (if ns (str "#:" ns "{") (open-delim coll))]
       [o coll])))
 
 (defn ^:private meets-print-level?
@@ -185,22 +184,13 @@
       (write-into writer " ")
       (-print (val this) writer opts))))
 
-(defn ^:private printable-meta [form]
-  (when (and *print-meta* *print-readably*)
-    ;; prn does not print empty meta; clojure.pprint does.
-    (when-some [m (-> form meta not-empty)]
-      ;; As per https://github.com/clojure/clojure/blob/6975553804b0f8da9e196e6fb97838ea4e153564/src/clj/clojure/core_print.clj#L78-L80
-      (if (and (= (count m) 1) (:tag m))
-        (:tag m)
-        m))))
-
 (defn ^:private -print-map
   "Like -print, but only for maps."
   [coll writer opts]
   (if (meets-print-level? (:level opts 0))
     (write-into writer "#")
 
-    (let [[^String o form] (open-delim+form coll opts)]
+    (let [[^String o form] (open-delim+form coll)]
       (write-into writer o)
 
       (when (seq form)
@@ -223,7 +213,7 @@
   (if (meets-print-level? (:level opts 0))
     (write-into writer "#")
 
-    (let [[^String o form] (open-delim+form coll opts)]
+    (let [[^String o form] (open-delim+form coll)]
       (write-into writer o)
 
       (when (seq form)
@@ -333,12 +323,19 @@
   (with-str-writer (fn [writer] (-print form writer opts))))
 
 (defn ^:private print-mode
-  "Given a CountKeepingWriter, a length (long), and an options map, return a
-  keyword indicating a printing mode (:linear or :miser)."
-  [writer ^long len opts]
-  (if (<= len (unchecked-subtract-int (remaining writer) (:reserve-chars opts)))
-    :linear
-    :miser))
+  "Given a CountKeepingWriter, a form, and an options map, return a keyword
+  indicating a printing mode (:linear or :miser)."
+  [writer form opts]
+  (let [reserve-chars (:reserve-chars opts)
+        s (print-linear form opts)]
+    ;; If, after (possibly) reserving space for any closing delimiters of
+    ;; ancestor S-expressions, there's enough space to print the entire
+    ;; form in linear style on this line, do so.
+    ;;
+    ;; Otherwise, print the form in miser style.
+    (if (<= (strlen s) (unchecked-subtract-int (remaining writer) reserve-chars))
+      :linear
+      :miser)))
 
 (defn ^:private write-sep
   "Given a CountKeepingWriter and a printing mode, print a separator (a
@@ -372,39 +369,15 @@
           S-expressions above the current nesting level.")))
 
 (defn ^:private pprint-meta
-  "Given a CountKeepingWriter, a form, and options, pretty-print metadata
-  attached to the form, if any.
-
-  Return the printing mode (:linear or :miser) to use for pretty-printing the
-  form that the metadata is attached to."
-  [writer form opts]
-  (let [form-s (print-linear form opts)
-        form-s-len (strlen form-s)]
-    (when-some [m (printable-meta form)]
-      ;; To figure out the printing mode for the metadata map, we must linear-
-      ;; print both the metadata and the form, then use their combined length
-      ;; to determine whether to insert a space or a newline and indentation
-      ;; after the metadata map.
-      (let [meta-s (print-linear m opts)
-            meta-s-len (strlen meta-s)
-            ;; The total length of the linear string is the sum of:
-            ;;
-            ;; - The length of the caret (^).
-            ;; - The length of the linear-printed meta map.
-            ;; - The space character.
-            ;; - The length of the linear-printed form the meta is attached to.
-            total-s-len (+ 1 meta-s-len 1 form-s-len)
-            mode (print-mode writer total-s-len opts)]
-        ;; Tell the pretty-printer to include the caret (^) in the open
-        ;; delimiter.
-        (-pprint m writer (assoc opts :meta-map? true))
-        (write-sep writer mode)
-        (when (= :miser mode) (write writer (:indentation opts)))))
-
-    ;; Since we already had to linear-print the form earlier to determine the
-    ;; printing mode for the metadata map, use the length of the linear-
-    ;; printed form to determine and return the printing mode for the form.
-    (print-mode writer form-s-len opts)))
+  [form writer opts mode]
+  (when (and *print-meta* *print-readably*)
+    (when-some [m (meta form)]
+      (when (seq m)
+        (write writer "^")
+        ;; As per https://github.com/clojure/clojure/blob/6975553804b0f8da9e196e6fb97838ea4e153564/src/clj/clojure/core_print.clj#L78-L80
+        (let [m (if (and (= (count m) 1) (:tag m)) (:tag m) m)]
+          (-pprint m writer opts))
+        (write-sep writer mode)))))
 
 (defn ^:private pprint-opts
   [open-delim opts]
@@ -420,9 +393,12 @@
   [this writer opts]
   (if (meets-print-level? (:level opts))
     (write writer "#")
-    (let [[^String o form] (open-delim+form this opts)
-          mode (pprint-meta writer this opts)
+    (let [[^String o form] (open-delim+form this)
+          mode (print-mode writer this opts)
           opts (pprint-opts o opts)]
+
+      ;; Print possible meta
+      (pprint-meta form writer opts mode)
 
       ;; Print open delimiter
       (write writer o)
@@ -473,8 +449,7 @@
             ;; If, after writing the map entry key, there's enough space to
             ;; write the val on the same line, do so. Otherwise, write
             ;; indentation followed by val on the following line.
-            len (strlen (print-linear v opts))
-            mode (print-mode writer len (update opts :reserve-chars inc))]
+            mode (print-mode writer v (update opts :reserve-chars inc))]
         (write-sep writer mode)
         (when (= :miser mode) (write writer (:indentation opts)))
         (-pprint v writer opts)))))
@@ -484,9 +459,10 @@
   [this writer opts]
   (if (meets-print-level? (:level opts))
     (write writer "#")
-    (let [[^String o form] (open-delim+form this opts)
-          mode (pprint-meta writer this opts)
-          opts (pprint-opts o (assoc opts :meta-map? false))]
+    (let [[^String o form] (open-delim+form this)
+          mode (print-mode writer this opts)
+          opts (pprint-opts o opts)]
+      (pprint-meta form writer opts mode)
       (write writer o)
       (if (= *print-length* 0)
         (write writer "...")

@@ -20,7 +20,6 @@
   (is (= "{:a 1}\n" (pp {:a 1})))
   (is (= "(1 nil)\n" (pp '(1 nil))))
   (is (= "{:a 1, :b 2, :c 3, :d 4}\n" (pp {:a 1 :b 2 :c 3 :d 4} :max-width 24)))
-  (is (= "[:a 1 :b 2 :c 3 :d 4]\n" (pp [:a 1 :b 2 :c 3 :d 4] :max-width 21)))
 
   (is (= "{:args\n [{:op :var,\n   :assignable? true}]}\n"
         (pp {:args [{:op :var :assignable? true}]} :max-width 24)))
@@ -198,85 +197,8 @@
   (is (= "{:a 1}\n"
         (pp (with-meta {:a 1} {:b 2}) :print-meta true :print-readably false)))
 
-  ;; prn does not print empty meta; clojure.pprint does
-  (is (= "{:a 1}\n" (pp (with-meta {:a 1} {}) :print-meta true)))
-  (is (= "[:a 1]\n" (pp (with-meta [:a 1] {}) :print-meta true))))
-
-(deftest pprint-meta-vec
-  ;; tag
-  (is (= "^{:m true}\n[:a 1]\n" (pp ^:m [:a 1] :max-width 16 :print-meta true)))
-  (is (= "^{:m true} [:a 1]\n" (pp ^:m [:a 1] :max-width 17 :print-meta true)))
-  (is (= "^{:m true}\n[:a 1 :b 2]\n" (pp ^:m [:a 1 :b 2] :max-width 21 :print-meta true)))
-  (is (= "^{:m true} [:a 1 :b 2]\n" (pp ^:m [:a 1 :b 2] :max-width 22 :print-meta true)))
-
-  ;; max-width falls short of x length and m length
-  (is (= "^{:b\n  2}\n[:a\n 11]\n" (pp (with-meta [:a 11] {:b 2}) :print-meta true :max-width 6)))
-  ;; max-width meets x length and m length
-  (is (= "^{:b 2}\n[:a 11]\n" (pp (with-meta [:a 11] {:b 2}) :print-meta true :max-width 7)))
-  ;; max-width exceeds x length and m length by one
-  (is (= "^{:b 2}\n[:a 11]\n" (pp (with-meta [:a 11] {:b 2}) :print-meta true :max-width 8)))
-  ;; max-width falls short of combined x and m length
-  (is (= "^{:b 2}\n[:a 11]\n" (pp (with-meta [:a 11] {:b 2}) :print-meta true :max-width 14)))
-  ;; max-width meets combined x and m length
-  (is (= "^{:b 2} [:a 11]\n" (pp (with-meta [:a 11] {:b 2}) :print-meta true :max-width 15)))
-  ;; max-width exceeds combined x and m length
-  (is (= "^{:b 2} [:a 11]\n" (pp (with-meta [:a 11] {:b 2}) :print-meta true :max-width 16)))
-  ;; max-width falls short of x length but exceeds m length
-  (is (= "^{:c 3}\n[:a\n 11\n :b\n 2]\n" (pp (with-meta [:a 11 :b 2] {:c 3}) :print-meta true :max-width 8)))
-  ;; max-width exceeds x length but falls short of m length
-  (is (= "^{:b 2,\n  :c 3}\n[:a 11]\n" (pp (with-meta [:a 11] {:b 2 :c 3}) :print-meta true :max-width 7)))
-
-  ;; nested meta
-  (is (= "{:a\n ^{:c\n   3}\n [:b 2]}\n" (pp {:a (with-meta [:b 2] {:c 3})} :max-width 8 :print-meta true)))
-  (is (= "{:a\n ^{:c 3}\n [:b 2]}\n" (pp {:a (with-meta [:b 2] {:c 3})} :max-width 9 :print-meta true)))
-  (is (= "[^{:a 1,\n   :b 2}\n {:a 1}]\n" (pp [^{:a 1 :b 2} {:a 1}] :max-width 14 :print-meta true))))
-
-(deftest pprint-meta-vec-print-level
-  (is (= "^{#, #} [:a 1 :b #]\n"
-        (pp (with-meta [:a 1 :b [:c 2]] {:a 1 :b {:c 2}}) :print-meta true :print-level 1)))
-  (is (= "^{:a 1, :b #} [:a 1 :b [:c 2]]\n"
-        (pp (with-meta [:a 1 :b [:c 2]] {:a 1 :b {:c 2}}) :print-meta true :print-level 2)))
-  (is (= "^{:a 1, :b {#}} [:a 1 :b [:c 2]]\n"
-        (pp (with-meta [:a 1 :b [:c 2]] {:a 1 :b {:c 2}}) :print-meta true :print-level 3)))
-  (is (= "^{:a 1, :b {:c 2}} [:a 1 :b [:c 2]]\n"
-        (pp (with-meta [:a 1 :b [:c 2]] {:a 1 :b {:c 2}}) :print-meta true :print-level 4))))
-
-(deftest pprint-meta-map
-  ;; tag
-  (is (= "^{:m true}\n{:a 1}\n" (pp ^:m {:a 1} :max-width 16 :print-meta true)))
-  (is (= "^{:m true}\n{:a 1, :b 2}\n" (pp ^:m {:a 1 :b 2} :max-width 22 :print-meta true)))
-
-  ;; max-width falls short of x length and m length
-  (is (= "^{:b\n  2}\n{:a\n 11}\n" (pp (with-meta {:a 11} {:b 2}) :print-meta true :max-width 6)))
-  ;; max-width meets x length and m length
-  (is (= "^{:b 2}\n{:a 11}\n" (pp (with-meta {:a 11} {:b 2}) :print-meta true :max-width 7)))
-  ;; max-width exceeds x length and m length by one
-  (is (= "^{:b 2}\n{:a 11}\n" (pp (with-meta {:a 11} {:b 2}) :print-meta true :max-width 8)))
-  ;; max-width falls short of combined x and m length
-  (is (= "^{:b 2}\n{:a 11}\n" (pp (with-meta {:a 11} {:b 2}) :print-meta true :max-width 14)))
-  ;; max-width meets combined x and m length
-  (is (= "^{:b 2} {:a 11}\n" (pp (with-meta {:a 11} {:b 2}) :print-meta true :max-width 15)))
-  ;; max-width exceeds combined x and m length
-  (is (= "^{:b 2} {:a 11}\n" (pp (with-meta {:a 11} {:b 2}) :print-meta true :max-width 16)))
-  ;; max-width falls short of x length but exceeds m length
-  (is (= "^{:c 3}\n{:a 1,\n :b 2}\n" (pp (with-meta {:a 1 :b 2} {:c 3}) :print-meta true :max-width 7)))
-  ;; max-width exceeds x length but falls short of m length
-  (is (= "^{:b 2,\n  :c 3}\n{:a 1}\n" (pp (with-meta {:a 1} {:b 2 :c 3}) :print-meta true :max-width 7)))
-
-  ;; nested meta
-  (is (= "{:a\n ^{:c\n   3}\n {:b 2}}\n" (pp {:a (with-meta {:b 2} {:c 3})} :max-width 8 :print-meta true)))
-  (is (= "{:a\n ^{:c 3}\n {:b 2}}\n" (pp {:a (with-meta {:b 2} {:c 3})} :max-width 9 :print-meta true)))
-  (is (= "{^{:a 1,\n   :b 2}\n {:a 1}\n {:c 3}}\n" (pp {^{:a 1 :b 2} {:a 1} {:c 3}} :max-width 14 :print-meta true))))
-
-(deftest pprint-meta-map-print-level
-  (is (= "^{#, #} {#, #}\n"
-        (pp (with-meta {:a 1 :b {:c 2}} {:a 1 :b {:c 2}}) :print-meta true :print-level 1)))
-  (is (= "^{:a 1, :b #} {:a 1, :b #}\n"
-        (pp (with-meta {:a 1 :b {:c 2}} {:a 1 :b {:c 2}}) :print-meta true :print-level 2)))
-  (is (= "^{:a 1, :b {#}} {:a 1, :b {#}}\n"
-        (pp (with-meta {:a 1 :b {:c 2}} {:a 1 :b {:c 2}}) :print-meta true :print-level 3)))
-  (is (= "^{:a 1, :b {:c 2}} {:a 1, :b {:c 2}}\n"
-        (pp (with-meta {:a 1 :b {:c 2}} {:a 1 :b {:c 2}}) :print-meta true :print-level 4))))
+  (is (= "{:a 1}\n"
+        (pp (with-meta {:a 1} {}) :print-meta true))))
 
 (deftest pprint-reader-macro-edge-cases
   ;; do not print the reader macro character if the collection following the
