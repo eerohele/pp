@@ -15,6 +15,26 @@
                   *print-dup* print-dup]
           (pp x :map-entry-separator map-entry-separator))))))
 
+(defspec roundtrip-meta 10000
+  (binding [*print-meta* true
+            *print-readably* true
+            *print-length* nil
+            *print-level* nil]
+    (for-all [max-width (gen/large-integer* {:min 1 :max 72})
+              x (gen/one-of
+                  [(gen/vector gen/any-printable-equatable 0 3)
+                   (gen/map gen/any-printable-equatable gen/any-printable-equatable
+                     {:min-elements 0
+                      :max-elements 3})
+                   (gen/set gen/any-printable-equatable
+                     {:min-elements 0
+                      :max-elements 3})])
+              m (gen/map gen/any-printable-equatable gen/any-printable-equatable
+                  {:min-elements 0
+                   :max-elements 3})]
+      (= (with-meta x m)
+        (read-string (pp (with-meta x m) {:max-width max-width}))))))
+
 (defspec level-zero-map-entry 10000
   (for-all [max-width gen/nat
             print-level gen/nat
