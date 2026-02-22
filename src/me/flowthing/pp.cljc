@@ -401,11 +401,6 @@
   ;; "#{").
   (str current-indentation (.repeat " " (strlen open-delim))))
 
-(defn ^:private pprint-opts
-  [open-delim opts]
-  (let [indentation (determine-indentation (:indentation opts) open-delim)]
-    (-> opts (assoc :indentation indentation) (update :level inc))))
-
 (defn ^:private -pprint-coll
   "Like -pprint, but only for lists, vectors and sets."
   [this writer opts]
@@ -413,7 +408,8 @@
     (write writer "#")
     (let [[^String o form] (open-delim+form this)
           mode (print-mode writer this opts)
-          opts (pprint-opts o opts)]
+          indentation (determine-indentation (:indentation opts) o)
+          opts (-> opts (assoc :indentation indentation) (update :level inc))]
 
       ;; Print possible meta
       (pprint-meta form writer opts mode)
@@ -428,7 +424,7 @@
           (loop [form form index 0]
             (if (= index *print-length*)
               (do
-                (when (= mode :miser) (write writer (:indentation opts)))
+                (when (= mode :miser) (write writer indentation))
                 (write writer "..."))
 
               (do
@@ -437,7 +433,7 @@
                 ;; indentation for the first form, because it
                 ;; immediately follows the open delimiter.
                 (when (and (= mode :miser) (pos? index))
-                  (write writer (:indentation opts)))
+                  (write writer indentation))
 
                 (let [f (first form)
                       n (next form)]
@@ -479,7 +475,8 @@
     (write writer "#")
     (let [[^String o form] (open-delim+form this)
           mode (print-mode writer this opts)
-          opts (pprint-opts o opts)]
+          indentation (determine-indentation (:indentation opts) o)
+          opts (-> opts (assoc :indentation indentation) (update :level inc))]
       (pprint-meta form writer opts mode)
       (write writer o)
       (if (= *print-length* 0)
@@ -488,12 +485,12 @@
           (loop [form form index 0]
             (if (= index *print-length*)
               (do
-                (when (= mode :miser) (write writer (:indentation opts)))
+                (when (= mode :miser) (write writer indentation))
                 (write writer "..."))
 
               (do
                 (when (and (= mode :miser) (pos? index))
-                  (write writer (:indentation opts)))
+                  (write writer indentation))
 
                 (let [f (first form)
                       n (next form)]
