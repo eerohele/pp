@@ -230,7 +230,9 @@
   (is (= "{:a\n ^{:c\n   3}\n [:b 2]}\n" (pp {:a (with-meta [:b 2] {:c 3})} :max-width 8 :print-meta true)))
   (is (= "{:a\n ^{:c 3}\n [:b 2]}\n" (pp {:a (with-meta [:b 2] {:c 3})} :max-width 9 :print-meta true)))
   (is (= "[^{:a 1,\n   :b 2}\n {:a 1}]\n" (pp [^{:a 1 :b 2} {:a 1}] :max-width 14 :print-meta true)))
-  (is (= "^{:m true}\n[^{:a 1} {:b 2}]\n" (pp ^:m [^{:a 1} {:b 2}] :max-width 26 :print-meta true))))
+  (is (= "^{:m true}\n[^{:a 1} {:b 2}]\n" (pp ^:m [^{:a 1} {:b 2}] :max-width 26 :print-meta true)))
+  (is (= "^{[:a 1] [:b 2]} {:c 3}\n" (pp (with-meta {:c 3} {[:a 1] [:b 2]}) :max-width 23 :print-meta true)))
+  (is (= "^{[:a 1] [:b 2]}\n{:c 3}\n" (pp (with-meta {:c 3} {[:a 1] [:b 2]}) :max-width 22 :print-meta true))))
 
 (deftest pprint-meta-vec-print-level
   (is (= "^{#, #} [:a 1 :b #]\n"
@@ -268,7 +270,9 @@
   (is (= "{:a\n ^{:c\n   3}\n {:b 2}}\n" (pp {:a (with-meta {:b 2} {:c 3})} :max-width 8 :print-meta true)))
   (is (= "{:a\n ^{:c 3}\n {:b 2}}\n" (pp {:a (with-meta {:b 2} {:c 3})} :max-width 9 :print-meta true)))
   (is (= "{^{:a 1,\n   :b 2}\n {:a 1}\n {:c 3}}\n" (pp {^{:a 1 :b 2} {:a 1} {:c 3}} :max-width 14 :print-meta true)))
-  (is (= "^{:m true} {^{:a 1} {:b 2} {:c 3}}" (pp ^:m {^{:a 1} {:b 2} {:c 3}} :max-width 33 :print-meta true))))
+  (is (= "^{:m true} {^{:a 1} {:b 2} {:c 3}}\n" (pp ^:m {^{:a 1} {:b 2} {:c 3}} :max-width 34 :print-meta true)))
+  (is (= "^{{:a 1} {:b 2}} {:c 3}\n" (pp (with-meta {:c 3} {{:a 1} {:b 2}}) :max-width 23 :print-meta true)))
+  (is (= "^{{:a 1} {:b 2}}\n{:c 3}\n" (pp (with-meta {:c 3} {{:a 1} {:b 2}}) :max-width 22 :print-meta true))))
 
 (deftest pprint-meta-map-print-level
   (is (= "^{#, #} {#, #}\n"

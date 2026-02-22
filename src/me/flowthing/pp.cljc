@@ -408,11 +408,11 @@
     (write writer "#")
     (do
       (-pprint m writer opts)
-
-      (let [mode (print-mode writer form opts)]
+      (let [opts (assoc opts :meta-map? false)
+            mode (print-mode writer form (update opts :reserve-chars inc))]
         (write-sep writer mode)
         (when (= :miser mode) (write writer (:indentation opts)))
-        (-pprint form writer (dissoc opts :meta-map?))))))
+        (-pprint form writer opts)))))
 
 (defn ^:private -pprint-coll
   "Like -pprint, but only for lists, vectors and sets."
@@ -501,7 +501,7 @@
     (let [[^String o form] (open-delim+form this opts)
           mode (print-mode writer this opts)
           indentation (determine-indentation (:indentation opts) o)
-          opts (-> opts (assoc :indentation indentation) (update :level inc))]
+          opts (-> opts (assoc :indentation indentation :meta-map? false) (update :level inc))]
       (pprint-meta form writer opts mode)
       (write writer o)
       (if (= *print-length* 0)
