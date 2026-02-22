@@ -184,6 +184,15 @@
       (write-into writer " ")
       (-print (val this) writer opts))))
 
+(defn ^:private printable-meta [form]
+  (when (and *print-meta* *print-readably*)
+    ;; prn does not print empty meta; clojure.pprint does.
+    (when-some [m (-> form meta not-empty)]
+      ;; As per https://github.com/clojure/clojure/blob/6975553804b0f8da9e196e6fb97838ea4e153564/src/clj/clojure/core_print.clj#L78-L80
+      (if (and (= (count m) 1) (:tag m))
+        (:tag m)
+        m))))
+
 (defn ^:private -print-map
   "Like -print, but only for maps."
   [coll writer opts]
@@ -370,14 +379,10 @@
 
 (defn ^:private pprint-meta
   [form writer opts mode]
-  (when (and *print-meta* *print-readably*)
-    (when-some [m (meta form)]
-      (when (seq m)
-        (write writer "^")
-        ;; As per https://github.com/clojure/clojure/blob/6975553804b0f8da9e196e6fb97838ea4e153564/src/clj/clojure/core_print.clj#L78-L80
-        (let [m (if (and (= (count m) 1) (:tag m)) (:tag m) m)]
-          (-pprint m writer opts))
-        (write-sep writer mode)))))
+  (when-some [m (printable-meta form)]
+    (write writer "^")
+    (-pprint m writer opts)
+    (write-sep writer mode)))
 
 (defn ^:private pprint-opts
   [open-delim opts]
