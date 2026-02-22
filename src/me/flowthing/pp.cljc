@@ -193,6 +193,12 @@
         (:tag m)
         m))))
 
+(defn ^:private print-meta [writer form opts]
+  (when-some [m (printable-meta form)]
+    (write-into writer "^")
+    (-print m writer opts)
+    (write-into writer " ")))
+
 (defn ^:private -print-map
   "Like -print, but only for maps."
   [coll writer opts]
@@ -200,6 +206,8 @@
     (write-into writer "#")
 
     (let [[^String o form] (open-delim+form coll)]
+      (print-meta writer coll opts)
+
       (write-into writer o)
 
       (when (seq form)
@@ -223,6 +231,8 @@
     (write-into writer "#")
 
     (let [[^String o form] (open-delim+form coll)]
+      (print-meta writer coll opts)
+
       (write-into writer o)
 
       (when (seq form)
