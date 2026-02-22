@@ -136,7 +136,7 @@
 
   If the coll is a record, the open delimiter includes the record name
   prefix."
-  [coll]
+  [coll opts]
   (if (record? coll)
     [(str "#" (record-name coll) "{") coll]
     ;; If all keys in the map share a namespace and *print-
@@ -150,7 +150,8 @@
 
           coll (if ns ns-map coll)
 
-          o (if ns (str "#:" ns "{") (open-delim coll))]
+          o (if ns (str "#:" ns "{") (open-delim coll))
+          o (if (:meta-map? opts) (str "^" o) o)]
       [o coll])))
 
 (defn ^:private meets-print-level?
@@ -205,7 +206,7 @@
   (if (meets-print-level? (:level opts 0))
     (write-into writer "#")
 
-    (let [[^String o form] (open-delim+form coll)]
+    (let [[^String o form] (open-delim+form coll opts)]
       (print-meta writer coll opts)
 
       (write-into writer o)
@@ -230,7 +231,7 @@
   (if (meets-print-level? (:level opts 0))
     (write-into writer "#")
 
-    (let [[^String o form] (open-delim+form coll)]
+    (let [[^String o form] (open-delim+form coll opts)]
       (print-meta writer coll opts)
 
       (write-into writer o)
@@ -401,18 +402,36 @@
   ;; "#{").
   (str current-indentation (.repeat " " (strlen open-delim))))
 
+(defn ^:private -pprint-with-meta
+  [m form writer opts]
+  (if (meets-print-level? (:level opts))
+    (write writer "#")
+    (do
+      (-pprint m writer opts)
+
+      (let [mode (print-mode writer form opts)]
+        (write-sep writer mode)
+        (when (= :miser mode) (write writer (:indentation opts)))
+        (-pprint form writer (dissoc opts :meta-map?))))))
+
 (defn ^:private -pprint-coll
   "Like -pprint, but only for lists, vectors and sets."
   [this writer opts]
-  (if (meets-print-level? (:level opts))
+  (cond
+    (meets-print-level? (:level opts))
     (write writer "#")
-    (let [[^String o form] (open-delim+form this)
+
+    (printable-meta this)
+    (-pprint-with-meta (printable-meta this) (with-meta this nil) writer (assoc opts :meta-map? true))
+
+    :else
+    (let [[^String o form] (open-delim+form this opts)
           mode (print-mode writer this opts)
           indentation (determine-indentation (:indentation opts) o)
           opts (-> opts (assoc :indentation indentation) (update :level inc))]
 
       ;; Print possible meta
-      (pprint-meta form writer opts mode)
+      #_(pprint-meta form writer opts mode)
 
       ;; Print open delimiter
       (write writer o)
@@ -466,14 +485,20 @@
             mode (print-mode writer v (update opts :reserve-chars inc))]
         (write-sep writer mode)
         (when (= :miser mode) (write writer (:indentation opts)))
-        (-pprint v writer opts)))))
+        (-pprint v writer (dissoc opts :meta-map?))))))
 
 (defn ^:private -pprint-map
   "Like -pprint, but only for maps."
   [this writer opts]
-  (if (meets-print-level? (:level opts))
+  (cond
+    (meets-print-level? (:level opts))
     (write writer "#")
-    (let [[^String o form] (open-delim+form this)
+
+    (printable-meta this)
+    (-pprint-with-meta (printable-meta this) (with-meta this nil) writer (assoc opts :meta-map? true))
+
+    :else
+    (let [[^String o form] (open-delim+form this opts)
           mode (print-mode writer this opts)
           indentation (determine-indentation (:indentation opts) o)
           opts (-> opts (assoc :indentation indentation) (update :level inc))]
