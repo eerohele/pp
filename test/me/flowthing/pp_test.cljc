@@ -42,6 +42,9 @@
              :e {:a 1 :b 2 :c 3 :d 4 :e {:f 6 :g 7 :h 8 :i 9 :j 10}}}
           :max-width 24)))
 
+  ;; Long key
+  (is (= "{{:a 1,\n  :b 2,\n  :c 3}\n {:d 4}}\n" (pp {{:a 1 :b 2 :c 3} {:d 4}} :max-width 16)))
+
   ;; Queues
   (is (= "<-()-<\n" (pp (q))))
   (is (= "<-(1)-<\n" (pp (conj (q) 1))))
@@ -234,7 +237,10 @@
   (is (= "^{:m true}\n[^{:a 1} [:b 2]]\n" (pp ^:m [^{:a 1} [:b 2]] :max-width 26 :print-meta true)))
   (is (= "^{:m true}\n[^{:a 1} #{1 2}]\n" (pp ^:m [^{:a 1} #{1 2}] :max-width 26 :print-meta true)))
   (is (= "^{[:a 1] [:b 2]} {:c 3}\n" (pp (with-meta {:c 3} {[:a 1] [:b 2]}) :max-width 23 :print-meta true)))
-  (is (= "^{[:a 1] [:b 2]}\n{:c 3}\n" (pp (with-meta {:c 3} {[:a 1] [:b 2]}) :max-width 22 :print-meta true))))
+  (is (= "^{[:a 1] [:b 2]}\n{:c 3}\n" (pp (with-meta {:c 3} {[:a 1] [:b 2]}) :max-width 22 :print-meta true)))
+
+  ;; long meta
+  (is (= "^{:a 1,\n  :b 2,\n  :c 3}\n[:d 4]\n" (pp (with-meta [:d 4] {:a 1 :b 2 :c 3}) :max-width 16 :print-meta true))))
 
 (deftest pprint-meta-vec-print-level
   (is (= "^{#, #} [:a 1 :b #]\n"
@@ -274,7 +280,10 @@
   (is (= "{^{:a 1,\n   :b 2}\n {:a 1}\n {:c 3}}\n" (pp {^{:a 1 :b 2} {:a 1} {:c 3}} :max-width 14 :print-meta true)))
   (is (= "^{:m true} {^{:a 1} {:b 2} {:c 3}}\n" (pp ^:m {^{:a 1} {:b 2} {:c 3}} :max-width 34 :print-meta true)))
   (is (= "^{{:a 1} {:b 2}} {:c 3}\n" (pp (with-meta {:c 3} {{:a 1} {:b 2}}) :max-width 23 :print-meta true)))
-  (is (= "^{{:a 1} {:b 2}}\n{:c 3}\n" (pp (with-meta {:c 3} {{:a 1} {:b 2}}) :max-width 22 :print-meta true))))
+  (is (= "^{{:a 1} {:b 2}}\n{:c 3}\n" (pp (with-meta {:c 3} {{:a 1} {:b 2}}) :max-width 22 :print-meta true)))
+
+  ;; long meta
+  (is (= "^{:a 1,\n  :b 2,\n  :c 3}\n{:d 4}\n" (pp (with-meta {:d 4} {:a 1 :b 2 :c 3}) :max-width 16 :print-meta true))))
 
 (deftest pprint-meta-map-print-level
   (is (= "^{#, #} {#, #}\n"

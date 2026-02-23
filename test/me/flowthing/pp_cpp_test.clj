@@ -31,6 +31,7 @@
       :d 4
       :e {:a 1 :b 2 :c 3 :d 4 :e {:f 6 :g 7 :h 8 :i 9 :j 10}}}
     :max-width 24)
+  ($ {{:a 1 :b 2 :c 3} {:d 4}} :max-width 16)
 
   ;; Queues
   ($ clojure.lang.PersistentQueue/EMPTY)
@@ -46,6 +47,7 @@
   ;; Meta
   ($ (with-meta {:a 1} {:b 2}) :print-meta true)
   ($ (with-meta {:a 1} {:b 2}) :print-meta true :max-width 2)
+  ($ (with-meta {:d 4} {:a 1 :b 2 :c 3}) :print-meta true :max-width 16)
   ($ ^:m [:a 1] :max-width 16 :print-meta true)
   ($ ^:m [:a 1] :max-width 17 :print-meta true)
   ($ ^:m [:a 1 :b 2] :max-width 21 :print-meta true)

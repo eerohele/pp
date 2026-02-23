@@ -396,8 +396,14 @@
     (do
       (write writer "^")
       ;; Account for the meta dispatch character (^) in the indentation.
-      (-pprint meta writer (update opts :indentation str " "))
-      (let [mode (print-mode writer form (update opts :reserve-chars inc))]
+      (let [m-mode (-pprint meta writer (update opts :indentation str " "))
+            mode (case m-mode
+                   ;; If the meta map was printed using miser mode, always use
+                   ;; miser mode for the form as well. Without this, if there's
+                   ;; room to print the entire form and the closing delimiter
+                   ;; on the last line of a multi-line meta map, pp will do so.
+                   :miser :miser
+                   (print-mode writer form (update opts :reserve-chars inc)))]
         (write-sep writer mode)
         (when (= :miser mode) (write writer (:indentation opts)))
         (-pprint form writer opts)))))
@@ -459,7 +465,8 @@
                         (recur n (inc index))))))))))
 
         ;; Print close delimiter
-        (write writer (close-delim form))))))
+        (write writer (close-delim form))
+        mode))))
 
 (defn ^:private -pprint-map-entry
   "Pretty-print a map entry within a map."
@@ -467,17 +474,18 @@
   (if (meets-print-level? (:level opts))
     (write writer "#")
     (let [k (key this)
-          opts (update opts :level inc)]
-      (-pprint k writer opts)
-
-      (let [v (val this)
-            ;; If, after writing the map entry key, there's enough space to
-            ;; write the val on the same line, do so. Otherwise, write
-            ;; indentation followed by val on the following line.
-            mode (print-mode writer v (update opts :reserve-chars inc))]
-        (write-sep writer mode)
-        (when (= :miser mode) (write writer (:indentation opts)))
-        (-pprint v writer opts)))))
+          opts (update opts :level inc)
+          k-mode (-pprint k writer opts)
+          v (val this)
+          ;; If, after writing the map entry key, there's enough space to
+          ;; write the val on the same line, do so. Otherwise, write
+          ;; indentation followed by val on the following line.
+          mode (case k-mode
+                 :miser :miser
+                 (print-mode writer v (update opts :reserve-chars inc)))]
+      (write-sep writer mode)
+      (when (= :miser mode) (write writer (:indentation opts)))
+      (-pprint v writer opts))))
 
 (defn ^:private -pprint-map
   "Like -pprint, but only for maps."
@@ -514,7 +522,8 @@
                         (write-sep writer mode)
                         (recur n (inc index))))))))))
 
-        (write writer (close-delim form))))))
+        (write writer (close-delim form))
+        mode))))
 
 (defn ^:private -pprint-seq
   [this writer opts]
