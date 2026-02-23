@@ -4,3 +4,4 @@ pom.xml.versionsBackup
 .shadow-cljs/
 node_modules/
 out/
+repl/scratch.repl
