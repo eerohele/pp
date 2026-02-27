@@ -17,6 +17,33 @@ All notable changes to this project will be documented in this file.
 
 - Improve performance (by avoiding boxed math)
 
+## TBA
+
+- Fix metadata printing [#8](https://github.com/eerohele/pp/issues/8)
+
+  Metadata printing worked correctly only in very small, elementary cases. It should now work better across the board.
+
+- Fix map entry printing when the key is longer than the val
+
+  Prior to this change, pp did this:
+
+  ```clojure
+  user=> (pp/pprint {{:a 1, :b 2, :c 3} {:d 4}} {:max-width 16})
+  {{:a 1,
+    :b 2,
+    :c 3} {:d 4}}
+  ```
+
+  After this change, pp does this:
+
+  ```clojure
+  user=> (pp/pprint {{:a 1, :b 2, :c 3} {:d 4}} {:max-width 16})
+  {{:a 1,
+    :b 2,
+    :c 3}
+   {:d 4}}
+  ```
+
 ## 2024-09-09.69
 
 - Print map entries (`clojure.lang.MapEntry`) like vectors everywhere except within maps #6
