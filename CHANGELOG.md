@@ -2,21 +2,6 @@
 
 All notable changes to this project will be documented in this file.
 
-## 2024-11-13.77
-
-- Improve printing of Java arrays.
-
-  pp now prints Java arrays like clojure.pprint, but without commas:
-
-  ```clojure
-  user=> (clojure.pprint/pprint (char-array [\c \p \p]))
-  [\c, \p, \p]
-  user=> (me.flowthing.pp/pprint (char-array [\p \p]))
-  [\p \p]
-  ```
-
-- Improve performance (by avoiding boxed math)
-
 ## 2026-02-28.98
 
 - Fix metadata printing [#8](https://github.com/eerohele/pp/issues/8)
@@ -43,6 +28,21 @@ All notable changes to this project will be documented in this file.
     :c 3}
    {:d 4}}
   ```
+
+## 2024-11-13.77
+
+- Improve printing of Java arrays.
+
+  pp now prints Java arrays like clojure.pprint, but without commas:
+
+  ```clojure
+  user=> (clojure.pprint/pprint (char-array [\c \p \p]))
+  [\c, \p, \p]
+  user=> (me.flowthing.pp/pprint (char-array [\p \p]))
+  [\p \p]
+  ```
+
+- Improve performance (by avoiding boxed math)
 
 ## 2024-09-09.69
 
