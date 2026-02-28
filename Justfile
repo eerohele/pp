@@ -17,5 +17,6 @@ bench:
   clojure -X:dev user/xr! '{:path "bench"}'
 
 release: test
+  clojure -Spom
   clojure -T:build release
   mvn clean deploy
