@@ -17,7 +17,7 @@ All notable changes to this project will be documented in this file.
 
 - Improve performance (by avoiding boxed math)
 
-## TBA
+## 2026-02-28.98
 
 - Fix metadata printing [#8](https://github.com/eerohele/pp/issues/8)
 

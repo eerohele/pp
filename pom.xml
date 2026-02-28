@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.flowthing</groupId>
   <artifactId>pp</artifactId>
-  <version>2024-11-13.77</version>
+  <version>2026-02-28.98</version>
   <name>pp</name>
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -15,12 +15,16 @@
   </build>
   <repositories>
     <repository>
-         <id>clojars</id>
-         <url>https://repo.clojars.org/</url>
-      </repository>
-   </repositories>
-   <distributionManagement>
-      <repository>
+      <id>clojars</id>
+      <url>https://repo.clojars.org/</url>
+    </repository>
+    <repository>
+      <id>cognitect-dev-tools</id>
+      <url>https://dev-tools.cognitect.com/maven/releases/</url>
+    </repository>
+  </repositories>
+  <distributionManagement>
+    <repository>
       <id>clojars</id>
       <name>Clojars repository</name>
       <url>https://clojars.org/repo</url>
@@ -37,4 +41,11 @@
   <scm>
     <url>https://github.com/eerohele/pp</url>
   </scm>
+  <dependencies>
+    <dependency>
+      <groupId>org.clojure</groupId>
+      <artifactId>clojure</artifactId>
+      <version>1.12.4</version>
+    </dependency>
+  </dependencies>
 </project>
