@@ -15,7 +15,6 @@
 
 (defn bump-coords
   [{:git/keys [tag sha]}]
-  (build/process {:command-args ["mvn" "versions:set" (format "-DnewVersion=%s" tag)]})
   (spit "README.md"
     (->
       (slurp "README.md")
