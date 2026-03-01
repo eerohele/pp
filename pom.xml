@@ -36,6 +36,9 @@
   </licenses>
   <scm>
     <url>https://github.com/eerohele/pp</url>
+    <connection>scm:git:git://github.com/eerohele/pp.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/eerohele/pp.git</developerConnection>
+    <tag>2026-02-28.98</tag>
   </scm>
   <dependencies>
     <dependency>
