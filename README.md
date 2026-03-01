@@ -41,10 +41,10 @@ Either:
 
     ```clojure
     ;; Maven coordinates
-    me.flowthing/pp {:mvn/version "2026-03-01.103"}
+    me.flowthing/pp {:mvn/version "2026-03-01.104"}
 
     ;; Git coordinates
-    io.github.eerohele/pp {:git/tag "2026-03-01.103" :git/sha "af0e73d"}
+    io.github.eerohele/pp {:git/tag "2026-03-01.104" :git/sha "28f0341"}
     ```
 
 Then:
