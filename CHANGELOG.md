@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## 2026-02-28.98
+## 2026-03-01.107
 
 - Fix metadata printing [#8](https://github.com/eerohele/pp/issues/8)
 
@@ -28,6 +28,10 @@ All notable changes to this project will be documented in this file.
     :c 3}
    {:d 4}}
   ```
+
+## 2026-02-28.98
+
+- DOA due to deployment SNAFU, ignore
 
 ## 2024-11-13.77
 
