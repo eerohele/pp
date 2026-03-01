@@ -18,10 +18,6 @@
       <id>clojars</id>
       <url>https://repo.clojars.org/</url>
     </repository>
-    <repository>
-      <id>cognitect-dev-tools</id>
-      <url>https://dev-tools.cognitect.com/maven/releases/</url>
-    </repository>
   </repositories>
   <distributionManagement>
     <repository>
