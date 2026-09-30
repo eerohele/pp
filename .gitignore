@@ -5,3 +5,5 @@ pom.xml.versionsBackup
 node_modules/
 out/
 repl/scratch.repl
+.clj-kondo/.cache/
+.lsp/.cache/
