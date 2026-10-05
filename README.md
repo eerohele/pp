@@ -19,7 +19,7 @@ Supports [Clojure](https://clojure.org), [ClojureScript](https://clojurescript.o
 ## Features
 
 - [Fast](https://github.com/eerohele/pp/actions/workflows/bench.yml)[^1] (~14x-10x faster than [`fipp.edn/pprint`](https://github.com/brandonbloom/fipp) and ~85x–16x faster than [`clojure.pprint/pprint`](https://clojure.github.io/clojure/clojure.pprint-api.html#clojure.pprint/pprint) at Fipp's benchmark)
-- [Small](https://github.com/eerohele/pp/blob/main/src/me/flowthing/pp.cljc) (under ~500 lines of code, not counting comments)
+- [Small](ref/main/blob/src/me/flowthing/pp.cljc) (under ~500 lines of code, not counting comments)
 - Zero dependencies
 - Single namespace; either use as a dependency or vendor into your codebase
 - Output [similar](#differences-to-clojurepprint) to `clojure.pprint/pprint`
@@ -36,7 +36,7 @@ Supports [Clojure](https://clojure.org), [ClojureScript](https://clojurescript.o
 
 Either:
 
-- Copy [`src/me/flowthing/pp.cljc`](https://github.com/eerohele/pp/blob/main/src/me/flowthing/pp.cljc) into your codebase and rename the namespace to avoid conflicts, or:
+- Copy [`src/me/flowthing/pp.cljc`](ref/main/blob/src/me/flowthing/pp.cljc) into your codebase and rename the namespace to avoid conflicts, or:
 - Pull in via Maven or [Git](https://clojure.org/reference/deps_and_cli#_git):
 
     ```clojure
