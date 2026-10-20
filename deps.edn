@@ -17,10 +17,10 @@
                 thheller/shadow-cljs ^:antq/exclude {:mvn/version "2.25.8"}}}
 
   :bench
-  {:extra-deps {org.clojure/clojure {:mvn/version "1.12.4"}}}
+  {:extra-deps {org.clojure/clojure {:mvn/version "1.12.6"}}}
 
   :build
-  {:deps {io.github.clojure/tools.build {:git/tag "v0.10.12" :git/sha "97c5562"}}
+  {:deps {io.github.clojure/tools.build {:git/tag "v0.10.14" :git/sha "1176afd"}}
    :ns-default build}
 
   :build.edn
